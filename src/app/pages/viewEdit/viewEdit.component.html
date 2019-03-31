@@ -1,0 +1,33 @@
+<ng-container *ngFor="let data of data$ | async">
+    <ng-container [ngSwitch]="data.view.type">
+        <ng-container *ngSwitchCase="'member'">
+            <app-view-group-list-edit
+                [(loading)]="loading"
+                [data]="data"
+                (reload)="onReload()"
+                (submitCreate)="onCreate()"
+            ></app-view-group-list-edit>
+        </ng-container>
+        <ng-container *ngSwitchCase="'memberOf'">
+            <app-view-group-list-edit
+                [(loading)]="loading"
+                [data]="data"
+                (reload)="onReload()"
+                (submitCreate)="onCreate()"
+            ></app-view-group-list-edit>
+        </ng-container>
+        <app-view-group-fields-edit
+            *ngSwitchCase="'fields'"
+            [(loading)]="loading"
+            [data]="data"
+            (reload)="onReload()"
+            (submitCreate)="onCreate()"
+        ></app-view-group-fields-edit>
+        <ng-container *ngSwitchDefault>
+            {{data.view.type}}
+        </ng-container>
+    </ng-container>
+</ng-container>
+<div *ngIf="!(this.activatedRoute.paramMap | async).get('primaryKey')" class="form-group">
+    <button [disabled]="loading" class="btn btn-primary" (click)="onCreate()">Create</button>
+</div>

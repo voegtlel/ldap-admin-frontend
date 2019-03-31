@@ -1,0 +1,39 @@
+<div class="form-group" [ngClass]="{'has-error': submitted && formControlRef.errors}">
+    <ng-container *ngIf="type=='checkbox'">
+        <nb-checkbox [formControl]="formControlRef" [disabled]="readonly"
+                     [status]="submitted && formControlRef.errors ? 'danger':''">{{title}}{{formControlRef.dirty ? ' *' : ''}}</nb-checkbox>
+    </ng-container>
+    <ng-container *ngIf="type=='text' || type=='password'">
+        <ng-container *ngIf="!togglePassword">
+            <label [for]="formControlEl">{{title}}{{formControlRef.dirty ? ' *' : ''}}</label>
+            <div class="input-group">
+                <input [type]="asText?'text':type" [formControl]="formControlRef" class="form-control"
+                       [readonly]="readonly"
+                       nbInput fullWidth [placeholder]="title"
+                       [status]="submitted && formControlRef.errors ? 'danger':''"
+                       #formControlEl/>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="togglePassword">
+            <label [for]="formControlEl">{{title}}{{formControlRef.dirty ? ' *' : ''}}</label>
+            <div class="input-group">
+                <input [type]="asText?'text':type" [formControl]="formControlRef" class="form-control"
+                       [readonly]="readonly"
+                       nbInput
+                       [placeholder]="title" [status]="submitted && formControlRef.errors ? 'danger':''"
+                       #formControlEl/>
+                <span class="input-group-append">
+                    <button type="button" class="btn btn-danger btn-flat input-group-text" (click)="asText=!asText">
+                        <i class="fa fa-eye" *ngIf="!asText"></i>
+                        <i class="fa fa-eye-slash" *ngIf="asText"></i>
+                    </button>
+                </span>
+            </div>
+        </ng-container>
+    </ng-container>
+    <div *ngIf="submitted && formControlRef.errors" class="invalid-feedback">
+        <div *ngIf="formControlRef.errors.required">{{title}} is required</div>
+        <div *ngIf="formControlRef.errors.matchPassword">Passwords do not match</div>
+        <div *ngIf="formControlRef.errors.external">{{formControlRef.errors.external}}</div>
+    </div>
+</div>
