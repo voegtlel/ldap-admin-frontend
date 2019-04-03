@@ -41,7 +41,6 @@ import {
 } from '@nebular/theme';
 
 import {NB_AUTH_TOKEN_INTERCEPTOR_FILTER, NbAuthJWTInterceptor} from '@nebular/auth';
-import {AutosizeModule} from 'ngx-autosize';
 
 import {APP_BASE_HREF} from '@angular/common';
 
@@ -119,7 +118,6 @@ import {FilterModelPipe} from './_pipes';
         FormsModule,
         HttpClientModule,
         routing,
-        AutosizeModule,
         NgbModule,
     ],
     providers: [
