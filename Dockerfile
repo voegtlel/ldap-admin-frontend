@@ -3,7 +3,7 @@ FROM node:alpine as builder
 RUN apk update && apk add --no-cache make git
 COPY . /app
 WORKDIR /app
-ARG API_URL
+ARG API_URL="/api"
 RUN sed -i "s!API_URL!$API_URL!g" /app/src/environments/environment.prod.ts && \
     cat /app/src/environments/environment.prod.ts && \
     cd /app && \
