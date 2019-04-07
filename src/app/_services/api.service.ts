@@ -2,10 +2,10 @@ import {HttpClient} from '@angular/common/http';
 
 import {BehaviorSubject, EMPTY, Observable, of} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {environment} from '../../environments/environment';
 import {first, map, switchMap} from 'rxjs/operators';
 import {ViewListValue, Views, ViewDetailValue, ViewValueAssignment, AuthUserModel} from '../_models';
 import {NbAuthService} from '@nebular/auth';
+import {EnvService} from './env.service';
 
 
 @Injectable({
@@ -15,13 +15,13 @@ export class ApiService {
     public readonly viewConfig$: BehaviorSubject<Views> = new BehaviorSubject(null);
     public readonly viewConfigSafe$: Observable<Views>;
 
-    constructor(private http: HttpClient, private authService: NbAuthService) {
+    constructor(private http: HttpClient, private authService: NbAuthService, private env: EnvService) {
         authService.isAuthenticated().subscribe((user) => console.log('User:', user));
         authService.getToken().subscribe((token) => console.log('Token:', token));
 
         authService.isAuthenticated().pipe(
             switchMap(
-                (isAuthenticated) => isAuthenticated ? http.get<Views>(`${environment.apiUrl}/config/`).pipe(first()) : of(null)
+                (isAuthenticated) => isAuthenticated ? http.get<Views>(`${env.apiUrl}/config/`).pipe(first()) : of(null)
             )
         ).subscribe((config) => {
             if ((this.viewConfig$.value === null) !== (config === null)) {
@@ -40,29 +40,29 @@ export class ApiService {
     }
 
     createView(view: string, assignments: ViewValueAssignment): Observable<null> {
-        return this.http.post<null>(`${environment.apiUrl}/${view}/`, assignments);
+        return this.http.post<null>(`${this.env.apiUrl}/${view}/`, assignments);
     }
 
     getViewList(view: string): Observable<ViewListValue> {
-        return this.http.get<ViewListValue>(`${environment.apiUrl}/${view}/`).pipe(map(x => {
-            console.log(`GET ${environment.apiUrl}/${view}/`);
+        return this.http.get<ViewListValue>(`${this.env.apiUrl}/${view}/`).pipe(map(x => {
+            console.log(`GET ${this.env.apiUrl}/${view}/`);
             return x;
         }));
     }
 
     getView(view: string, primaryKey: string): Observable<ViewDetailValue> {
-        return this.http.get<ViewDetailValue>(`${environment.apiUrl}/${view}/${primaryKey}/`);
+        return this.http.get<ViewDetailValue>(`${this.env.apiUrl}/${view}/${primaryKey}/`);
     }
 
     updateView(view: string, primaryKey: string, assignments: ViewValueAssignment): Observable<null> {
-        return this.http.patch<null>(`${environment.apiUrl}/${view}/${primaryKey}/`, assignments);
+        return this.http.patch<null>(`${this.env.apiUrl}/${view}/${primaryKey}/`, assignments);
     }
 
     deleteView(view: string, primaryKey: string): Observable<null> {
-        return this.http.delete<null>(`${environment.apiUrl}/${view}/${primaryKey}/`);
+        return this.http.delete<null>(`${this.env.apiUrl}/${view}/${primaryKey}/`);
     }
 
     getAuthSelf(): Observable<AuthUserModel> {
-        return this.http.get<AuthUserModel>(`${environment.apiUrl}/auth/`);
+        return this.http.get<AuthUserModel>(`${this.env.apiUrl}/auth/`);
     }
 }

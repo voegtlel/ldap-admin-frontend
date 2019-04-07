@@ -48,7 +48,7 @@ import {AppComponent} from './app.component';
 
 import {routing} from './app.routing';
 
-import {authModule} from './auth/auth.module';
+import {authModule, NbPasswordAuthStrategyEndpoint} from './auth/auth.module';
 import {LoginComponent} from './auth/login/login.component';
 
 import {PagesComponent} from './pages/pages.component';
@@ -122,9 +122,10 @@ import {FilterModelPipe} from './_pipes';
     ],
     providers: [
         NbSidebarService,
-        {provide: APP_BASE_HREF, useValue: '/'},
-        {provide: HTTP_INTERCEPTORS, useClass: NbAuthJWTInterceptor, multi: true},
-        { provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER, useValue: function () { return false; }, },
+        NbPasswordAuthStrategyEndpoint,
+        { provide: APP_BASE_HREF, useValue: '/' },
+        { provide: HTTP_INTERCEPTORS, useClass: NbAuthJWTInterceptor, multi: true },
+        { provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER, useValue: function () { return false; } },
     ],
     bootstrap: [AppComponent]
 })

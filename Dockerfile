@@ -3,10 +3,7 @@ FROM node:alpine as builder
 RUN apk update && apk add --no-cache make git
 COPY . /app
 WORKDIR /app
-ARG API_URL="/api"
-RUN sed -i "s!API_URL!$API_URL!g" /app/src/environments/environment.prod.ts && \
-    cat /app/src/environments/environment.prod.ts && \
-    cd /app && \
+RUN cd /app && \
     npm set progress=false && \
     npm install && \
     npm run build-prod
@@ -17,5 +14,10 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 ## From 'builder' copy website to default nginx public folder
 COPY --from=builder /app/dist /usr/share/nginx/html
+# Additional startup stuff
+ADD docker/nginx_default_with_api.conf.template /etc/nginx/conf.d/default.conf.template
+ADD docker/nginx_default.conf /etc/nginx/conf.d/default.conf
+ADD src/env.js.template /usr/share/nginx/html/env.js.template
+ADD docker/startup.sh /bin/startup.sh
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["sh", "/bin/startup.sh"]

@@ -2,7 +2,7 @@ import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {map, startWith, switchMap} from 'rxjs/operators';
 import {ViewList, ViewListValue} from '../_models';
-import {shareLast} from '../_helpers/rxjs';
+import {shareLast} from '../_helpers';
 import {ApiService} from './api.service';
 
 

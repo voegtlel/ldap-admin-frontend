@@ -24,21 +24,28 @@ services:
       BACKEND_HOST: backend
     port:
       - 80:80
+    networks:
+      - frontend
 
   backend:
     image: voegtlel/ldap-admin-backend
     restart: unless-stopped
     environment:
       API_CONFIG_LDAP_SERVER_URI: 'ldap://openldap'
+      API_CONFIG_LDAP_BIND_DN: 'cn=useradmin,ou=services,dc=jdav-freiburg,dc=de'
+      API_CONFIG_LDAP_BIND_PASSWORD: 'HaeCoth8muPhepheiphi'
+      API_CONFIG_PREFIX: 'dc=jdav-freiburg,dc=de'
       # Set this if you have a different origin
       # API_CONFIG_ALLOW_ORIGINS: "['https://admin.jdav-freiburg.de']"
 
     networks:
       - ldap
+      - frontend
   
   ldap:
     image: 
 networks:
   ldap:
     external: true
+  frontend:
 ```
