@@ -28,6 +28,6 @@
         </ng-container>
     </ng-container>
 </ng-container>
-<div *ngIf="!(this.activatedRoute.paramMap | async).get('primaryKey')" class="form-group">
+<div *ngIf="!(activatedRoute.paramMap | async).get('primaryKey')" class="form-group">
     <button [disabled]="loading" class="btn btn-primary" (click)="onCreate()">Create</button>
 </div>

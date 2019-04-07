@@ -43,7 +43,7 @@ export class ViewGroupListEditComponent implements OnChanges {
 
     constructor(
         private api: ApiService,
-        private dialogService: NbDialogService,
+        public dialogService: NbDialogService,
     ) {
     }
 

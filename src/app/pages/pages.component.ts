@@ -11,7 +11,7 @@ export class PagesComponent implements OnInit {
     public menuItems: NbMenuItem[];
 
     constructor(
-        private authService: AuthService,
+        public authService: AuthService,
         public api: ApiService,
     ) {
         this.menuItems = [

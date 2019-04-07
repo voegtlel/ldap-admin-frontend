@@ -10,4 +10,35 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Docker
 
-Run `docker build`.
+The docker image is located at `voegtlel/ldap-admin-frontend`.
+
+## Docker compose
+```
+version: '3'
+services:
+  frontend:
+    image: voegtlel/ldap-admin-frontend
+    restart: unless-stopped
+    # TODO: forward backend to /api
+    environment:
+      BACKEND_HOST: backend
+    port:
+      - 80:80
+
+  backend:
+    image: voegtlel/ldap-admin-backend
+    restart: unless-stopped
+    environment:
+      API_CONFIG_LDAP_SERVER_URI: 'ldap://openldap'
+      # Set this if you have a different origin
+      # API_CONFIG_ALLOW_ORIGINS: "['https://admin.jdav-freiburg.de']"
+
+    networks:
+      - ldap
+  
+  ldap:
+    image: 
+networks:
+  ldap:
+    external: true
+```

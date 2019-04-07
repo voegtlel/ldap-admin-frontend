@@ -40,10 +40,8 @@ export interface ViewGroupData {
     templateUrl: './viewEdit.component.html',
 })
 export class ViewEditComponent implements OnInit, OnDestroy {
-    form: FormGroup;
     loading = true;
     error: string = null;
-    submitted = false;
     data$: Observable<ViewGroupData[]>;
     view: View = null;
     @ViewChildren(ViewGroupFieldsEditComponent) fieldsControls: QueryList<ViewGroupFieldsEditComponent>;
@@ -55,7 +53,7 @@ export class ViewEditComponent implements OnInit, OnDestroy {
         private api: ApiService,
         private listApi: ListApiService,
         private router: Router,
-        private activatedRoute: ActivatedRoute
+        public activatedRoute: ActivatedRoute
     ) {
     }
 
