@@ -49,7 +49,7 @@ services:
       API_CONFIG_LDAP_BIND_DN: 'cn=useradmin,ou=services,dc=jdav-freiburg,dc=de'
       API_CONFIG_LDAP_BIND_PASSWORD: 'HaeCoth8muPhepheiphi'
       # General API prefix.
-      API_CONFIG_PREFIX: 'dc=jdav-freiburg,dc=de'
+      API_CONFIG_LDAP_PREFIX: 'dc=jdav-freiburg,dc=de'
       
       # Override any config.yaml variable by typing API_CONFIG_<container>_<container...>_<variable>
       # where the names are automagically converted from camelCase to underscore_notation (ignoring casing).

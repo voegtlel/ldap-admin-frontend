@@ -24,7 +24,7 @@
                             <ng-container *ngSwitchDefault>{{value[field.key]}}</ng-container>
                         </ng-container>
                     </td>
-                    <td><a class="btn" (click)="dialogService.open(deleteModalBox, {context: value[view.primaryKey]})"><i class="fa fa-remove"></i></a></td>
+                    <td><a class="btn" (click)="$event.stopPropagation(); dialogService.open(deleteModalBox, {context: value[view.primaryKey]})"><i class="fa fa-remove"></i></a></td>
                 </tr>
             </tbody>
         </table>
@@ -35,7 +35,7 @@
   <nb-card>
     <nb-card-header>Are you sure?</nb-card-header>
     <nb-card-body>
-        Do you really want to delete user {{data}}? This is irreversible!
+        Do you really want to delete {{view.title}} "{{data}}"? This is irreversible!
     </nb-card-body>
     <nb-card-footer>
         <button nbButton class="float-left" state="danger" (click)="performDelete(data); ref.close()">Yes</button>

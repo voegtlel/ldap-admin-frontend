@@ -63,7 +63,7 @@ export class ViewListComponent implements OnInit, OnDestroy {
         }));
 
         this.subscriptions.push(this.data$.subscribe((data) => {
-            this.loading = !data;
+            this.loading = (data === null);
         }));
     }
 
