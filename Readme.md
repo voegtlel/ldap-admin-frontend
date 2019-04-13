@@ -1,4 +1,13 @@
+<p align="center">
+  <a href="https://cloud.docker.com/repository/docker/voegtlel/ldap-admin-frontend/builds">
+    <img src="https://img.shields.io/docker/cloud/build/voegtlel/ldap-admin-frontend.svg" alt="Docker build status" />
+  </a>
+</p>
+
+
 # Client for ldap admin
+
+This is the frontend for [ldap-admin-backend](https://github.com/voegtlel/ldap-admin-backend).
 
 ## Development server
 
@@ -19,33 +28,44 @@ services:
   frontend:
     image: voegtlel/ldap-admin-frontend
     restart: unless-stopped
-    # TODO: forward backend to /api
     environment:
-      BACKEND_HOST: backend
+      # Forward backend to /api
+      # (will set API_HOST='/api')
+      PROXY_API_HOST: backend
+      # OR: Host backend at separate URL:
+      # API_HOST: 'api.example.com'
     port:
+      # Serve at :80, you may for sure also use a reverse proxy, etc.
       - 80:80
     networks:
-      - frontend
+      - backend
 
   backend:
     image: voegtlel/ldap-admin-backend
     restart: unless-stopped
     environment:
+      # Define how to connect to the ldap server
       API_CONFIG_LDAP_SERVER_URI: 'ldap://openldap'
+      # How to bind the ldap admin
       API_CONFIG_LDAP_BIND_DN: 'cn=useradmin,ou=services,dc=jdav-freiburg,dc=de'
       API_CONFIG_LDAP_BIND_PASSWORD: 'HaeCoth8muPhepheiphi'
+      # General API prefix.
       API_CONFIG_PREFIX: 'dc=jdav-freiburg,dc=de'
-      # Set this if you have a different origin
-      # API_CONFIG_ALLOW_ORIGINS: "['https://admin.jdav-freiburg.de']"
-
+      
+      # Override any config.yaml variable by typing API_CONFIG_<container>_<container...>_<variable>
+      # where the names are automagically converted from camelCase to underscore_notation (ignoring casing).
+      
+      # Set this if you use different origin
+      # API_CONFIG_ALLOW_ORIGINS: "['https://admin.example.com']"
     networks:
-      - ldap
-      - frontend
+      - backend
   
   ldap:
-    image: 
+    image: yourldapserver
+    networks:
+      - backend
 networks:
   ldap:
     external: true
-  frontend:
+  backend:
 ```
