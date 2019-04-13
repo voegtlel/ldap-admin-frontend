@@ -1,8 +1,7 @@
-<p align="center">
-  <a href="https://cloud.docker.com/repository/docker/voegtlel/ldap-admin-frontend/builds">
-    <img src="https://img.shields.io/docker/cloud/build/voegtlel/ldap-admin-frontend.svg" alt="Docker build status" />
-  </a>
-</p>
+<a href="https://cloud.docker.com/repository/docker/voegtlel/ldap-admin-frontend/builds">
+  <img src="https://img.shields.io/docker/cloud/build/voegtlel/ldap-admin-frontend.svg" alt="Docker build status" />
+</a>
+<img src="https://img.shields.io/github/license/voegtlel/ldap-admin-backend.svg" alt="License" />
 
 
 # Client for ldap admin
