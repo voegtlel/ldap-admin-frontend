@@ -11,7 +11,7 @@ import {
     ViewValueAssignment
 } from '../../_models';
 import {ApiService, ViewValue} from '../../_services';
-import {NbDialogService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 
 export interface ViewGroupDataMember {
     viewName: string;
@@ -44,6 +44,7 @@ export class ViewGroupListEditComponent implements OnChanges {
     constructor(
         private api: ApiService,
         public dialogService: NbDialogService,
+        private toastrService: NbToastrService,
     ) {
     }
 
@@ -86,7 +87,6 @@ export class ViewGroupListEditComponent implements OnChanges {
             }
             this.updateCurrent();
         }
-        console.log('Loading:', this.data);
         this._localLoading = (!this.data || !this.data.value || !this.data.foreignView || !this.data.foreignView.data);
     }
 
@@ -122,14 +122,13 @@ export class ViewGroupListEditComponent implements OnChanges {
                 this.reload.emit();
             },
             error => {
-                console.log('Error:', error);
-                if (error.error && error.error.memberOfGroups) {
-                    this.error = error.error.memberOfGroups;
-                } else if (error.error && error.error.ldap) {
-                    this.error = error.error.ldap.text;
+                if (error.error) {
+                    this.toastrService.danger(error.error.description, error.error.title || 'Cannot Save');
+                    this.error = error.error.description;
                 } else {
-                    this.error = error.statusText;
+                    this.toastrService.danger(error, 'Error while saving');
                 }
+                console.log('Error:', error);
                 this.loading = false;
             }
         );

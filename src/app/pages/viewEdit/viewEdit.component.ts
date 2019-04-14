@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/co
 import {map, startWith, switchMap} from 'rxjs/operators';
 
 import {
-    View,
+    View, ViewFieldValueAny,
     ViewGroup,
     ViewGroupMember,
     ViewGroupMemberOf,
@@ -19,6 +19,7 @@ import {ViewGroupFieldsEditComponent} from '../viewGroupFieldsEdit/viewGroupFiel
 import {HttpErrorResponse} from '@angular/common/http';
 import {hasOwnProperty} from 'tslint/lib/utils';
 import {ViewGroupListEditComponent} from '../viewGroupListEdit/viewGroupListEdit.component';
+import {NbToastrService} from '@nebular/theme';
 
 
 const NEWVALUE = {};
@@ -41,7 +42,6 @@ export interface ViewGroupData {
 })
 export class ViewEditComponent implements OnInit, OnDestroy {
     loading = true;
-    error: string = null;
     data$: Observable<ViewGroupData[]>;
     view: View = null;
     @ViewChildren(ViewGroupFieldsEditComponent) fieldsControls: QueryList<ViewGroupFieldsEditComponent>;
@@ -53,7 +53,8 @@ export class ViewEditComponent implements OnInit, OnDestroy {
         private api: ApiService,
         private listApi: ListApiService,
         private router: Router,
-        public activatedRoute: ActivatedRoute
+        public activatedRoute: ActivatedRoute,
+        private toastrService: NbToastrService,
     ) {
     }
 
@@ -163,8 +164,13 @@ export class ViewEditComponent implements OnInit, OnDestroy {
                 );
             },
             (error: HttpErrorResponse) => {
-                this.error = error.statusText;
                 if (error.error) {
+                    this.toastrService.danger(error.error.description, error.error.title);
+                    if (error.error.field) {
+                        this.fieldsControls.forEach(control => control.setErrors(error.error.field[control.data.view.key]));
+                    }
+                } else {
+                    this.toastrService.danger(error, error.statusText);
                 }
                 console.log('Error:', error);
                 this.loading = false;

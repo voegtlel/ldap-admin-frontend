@@ -23,4 +23,17 @@ export class FormElementComponent implements OnInit {
 
     ngOnInit() {
     }
+
+    get error(): string {
+        if (this.formControlRef.errors) {
+            if (this.formControlRef.errors.required && this.submitted) {
+                return this.title + ' is required';
+            } else if (this.formControlRef.errors.matchPassword && this.submitted) {
+                return 'Passwords do not match';
+            } else if (this.formControlRef.errors.external) {
+                return this.formControlRef.errors.external;
+            }
+        }
+        return null;
+    }
 }

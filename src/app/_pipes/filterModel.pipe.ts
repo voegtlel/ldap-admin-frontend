@@ -10,7 +10,6 @@ export class FilterModelPipe implements PipeTransform {
         if (!term) {
             return items;
         }
-        console.log('Pipe', term);
         return items.filter(item =>
             Object.values(item).some((val) => val.toString().indexOf(term) !== -1)
         );

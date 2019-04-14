@@ -16,8 +16,8 @@ export class ApiService {
     public readonly viewConfigSafe$: Observable<Views>;
 
     constructor(private http: HttpClient, private authService: NbAuthService, private env: EnvService) {
-        authService.isAuthenticated().subscribe((user) => console.log('User:', user));
-        authService.getToken().subscribe((token) => console.log('Token:', token));
+        // authService.isAuthenticated().subscribe((user) => console.log('User:', user));
+        // authService.getToken().subscribe((token) => console.log('Token:', token));
 
         authService.isAuthenticated().pipe(
             switchMap(
@@ -35,8 +35,8 @@ export class ApiService {
             )
         );
 
-        this.viewConfig$.subscribe((config) => console.log('API config:', config));
-        this.viewConfigSafe$.subscribe((config) => console.log('Safe API config:', config));
+        // this.viewConfig$.subscribe((config) => console.log('API config:', config));
+        // this.viewConfigSafe$.subscribe((config) => console.log('Safe API config:', config));
     }
 
     createView(view: string, assignments: ViewValueAssignment): Observable<null> {
