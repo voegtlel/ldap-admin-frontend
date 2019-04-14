@@ -16,13 +16,14 @@
                 (submitCreate)="onCreate()"
             ></app-view-group-list-edit>
         </ng-container>
-        <app-view-group-fields-edit
-            *ngSwitchCase="'fields'"
-            [(loading)]="loading"
-            [data]="data"
-            (reload)="onReload()"
-            (submitCreate)="onCreate()"
-        ></app-view-group-fields-edit>
+        <ng-container *ngSwitchCase="'fields'">
+            <app-view-group-fields-edit
+                [(loading)]="loading"
+                [data]="data"
+                (reload)="onReload()"
+                (submitCreate)="onCreate()"
+            ></app-view-group-fields-edit>
+        </ng-container>
         <ng-container *ngSwitchDefault>
             {{data.view.type}}
         </ng-container>

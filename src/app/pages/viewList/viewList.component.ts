@@ -5,7 +5,7 @@ import {View, ViewList, ViewListValue} from '../../_models';
 import {ApiService, ListApiService} from '../../_services';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
-import {NbDialogService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 
 
 @Component({
@@ -29,6 +29,7 @@ export class ViewListComponent implements OnInit, OnDestroy {
         private router: Router,
         private activatedRoute: ActivatedRoute,
         private dialogService: NbDialogService,
+        private toastrService: NbToastrService,
     ) {
     }
 
@@ -81,9 +82,14 @@ export class ViewListComponent implements OnInit, OnDestroy {
                 this.loading = true;
                 this.reload$.next(null);
             },
-            (err) => {
+            (error) => {
                 this.loading = false;
-                console.log(err);
+                if (error.error) {
+                    this.toastrService.danger(error.error.description, error.error.title);
+                } else {
+                    this.toastrService.danger(error, 'Error while saving');
+                }
+                console.log('Error:', error);
             }
         );
     }

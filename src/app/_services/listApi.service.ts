@@ -37,7 +37,6 @@ export class ListApiService {
 
     public getViewList(viewName: string): Observable<ViewValue> {
         if (!this.lists.hasOwnProperty(viewName)) {
-            console.log('Initial load', viewName);
             this.reloads$[viewName] = new BehaviorSubject(null);
             this.lists[viewName] = shareLast(combineLatest(this.reload$, this.reloads$[viewName]).pipe(
                 switchMap(() => this.api.viewConfigSafe$),
@@ -55,9 +54,6 @@ export class ListApiService {
                     })
                 ))
             ));
-            this.lists[viewName].subscribe((data) => {
-                console.log('Reloaded', data);
-            });
         }
 
         return this.lists[viewName];

@@ -28,6 +28,9 @@
             </tr>
             </tbody>
         </table>
+        <div *ngIf="error" class="invalid-feedback">
+            {{error}}
+        </div>
     </nb-card-body>
 </nb-card>
 

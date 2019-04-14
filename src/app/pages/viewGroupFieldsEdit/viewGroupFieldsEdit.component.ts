@@ -4,6 +4,7 @@ import {ViewGroupFields, ViewGroupValueFields, ViewValueAssignment} from '../../
 import {ApiService} from '../../_services';
 import {AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
+import {NbToastrService} from '@nebular/theme';
 
 
 export interface ViewGroupDataFields {
@@ -61,7 +62,6 @@ class FormControlWithOriginal extends FormControl {
 export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
     form: FormGroup;
     @Output() loadingChange = new EventEmitter<boolean>();
-    error: string = null;
     submitted = false;
     @Output() reload = new EventEmitter<void>();
     @Output() submitCreate = new EventEmitter<void>();
@@ -70,6 +70,7 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
 
     constructor(
         private api: ApiService,
+        private toastrService: NbToastrService,
     ) {
     }
 
@@ -93,7 +94,6 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
 
     updateViews() {
         if (this.data) {
-            console.log('Data:', this.data);
             this.form = new FormGroup(
                 this.data.view.fields.reduce((obj2, field) => {
                     let fieldValue: string | boolean = '';
@@ -143,16 +143,26 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
 
         this.data.view.fields.forEach((field) => {
             const formField = <FormControlWithOriginal>this.form.get(field.key);
+            formField.setErrors(null);
             if (formField.dirty) {
                 entryFields[field.key] = formField.value;
             }
         });
 
-        this.error = null;
-
         entry[this.data.view.key] = entryFields;
 
         return true;
+    }
+
+    public setErrors(errors: {[key: string]: string} = null) {
+        this.form.updateValueAndValidity();
+        if (errors !== null) {
+            Object.entries(errors).forEach(([key, err]) => {
+                if (this.form.contains(key)) {
+                    this.form.get(key).setErrors({external: err});
+                }
+            });
+        }
     }
 
     onSubmit() {
@@ -175,8 +185,17 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
                 this.reload.emit();
             },
             (error: HttpErrorResponse) => {
-                this.error = error.statusText;
                 if (error.error) {
+                    this.toastrService.danger(error.error.description, error.error.title);
+                    if (error.error.field) {
+                        if (error.error.field.hasOwnProperty(this.data.view.key)) {
+                            this.setErrors(error.error.field[this.data.view.key]);
+                        } else {
+                            this.setErrors(error.error.field);
+                        }
+                    }
+                } else {
+                    this.toastrService.danger(error, 'Error while saving');
                 }
                 console.log('Error:', error);
                 this.loading = false;
