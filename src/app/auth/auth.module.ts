@@ -12,6 +12,9 @@ export class NbPasswordAuthStrategyEndpoint extends NbPasswordAuthStrategy {
 
     protected getActionEndpoint(action: string): string {
         const endpoint = super.getActionEndpoint(action);
+        if (!endpoint) {
+            return endpoint;
+        }
         const apiUrl = getApiUrl();
         return apiUrl + endpoint;
     }
