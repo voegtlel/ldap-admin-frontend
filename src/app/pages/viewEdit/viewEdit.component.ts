@@ -159,6 +159,7 @@ export class ViewEditComponent implements OnInit, OnDestroy {
         query.subscribe(
             () => {
                 this.loading = true;
+                this.listApi.reload(this.view.key);
                 this.router.navigate(
                     ['/edit', this.view.key, primaryKey]
                 );

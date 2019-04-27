@@ -2,6 +2,7 @@
     <nb-card-header>
         {{data?.view.title}}
         <nb-actions *ngIf="data && !data.isNew" size="small" class="float-right">
+            <nb-action icon="fa fa-refresh" (click)="reload.emit(null)"></nb-action>
             <nb-action icon="fa fa-save" (click)="onSubmit()"></nb-action>
         </nb-actions>
     </nb-card-header>

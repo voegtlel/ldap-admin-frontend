@@ -2,6 +2,7 @@
     <nb-card-header>
         {{data ? data.view.title : ""}}
         <nb-actions size="small" class="float-right">
+            <nb-action icon="fa fa-refresh" (click)="reload.emit(null)"></nb-action>
             <nb-action icon="fa fa-save" (click)="onSubmit()" *ngIf="!data?.isNew"></nb-action>
             <nb-action icon="fa fa-plus" (click)="dialogService.open(addModalBox)"></nb-action>
         </nb-actions>
