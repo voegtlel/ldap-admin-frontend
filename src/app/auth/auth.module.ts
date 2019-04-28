@@ -27,7 +27,7 @@ export const authModule = NbAuthModule.forRoot({
             name: 'email',
             baseEndpoint: '',
             login: {
-                endpoint: '/jwt-auth/',
+                endpoint: '/jwt-auth',
                 defaultErrors: ['Username/password combination is not correct, please try again.'],
                 defaultMessages: ['You have been successfully logged in.'],
             },
