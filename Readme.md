@@ -56,6 +56,8 @@ services:
       
       # Set this if you use different origin
       # API_CONFIG_ALLOW_ORIGINS: "['https://admin.example.com']"
+      
+      API_CONFIG_AUTH_SECRET_KEY: 'your secret key for jwt'
     networks:
       - backend
   
