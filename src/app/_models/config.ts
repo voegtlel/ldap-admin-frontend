@@ -11,6 +11,13 @@ export interface ViewField {
 export interface ViewFieldText extends ViewField {
     field: string;
     format: string;
+    formatMessage: string;
+}
+
+export interface ViewFieldDateTime extends ViewField {
+    field: string;
+    format: string;
+    formatMessage: string;
 }
 
 export interface ViewFieldPassword extends ViewField {
@@ -31,7 +38,7 @@ export interface ViewFieldIsMemberOf extends ViewField {
     foreignField: string;
 }
 
-export type ViewFieldAny = ViewFieldText | ViewFieldPassword | ViewFieldGenerate | ViewFieldIsMemberOf;
+export type ViewFieldAny = ViewFieldText | ViewFieldDateTime | ViewFieldPassword | ViewFieldGenerate | ViewFieldIsMemberOf;
 
 export interface ViewGroup {
     key: string;

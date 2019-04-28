@@ -1,10 +1,15 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange} from '@angular/core';
 
-import {ViewGroupFields, ViewGroupValueFields, ViewValueAssignment} from '../../_models';
+import {ViewFieldDateTime, ViewFieldText, ViewGroupFields, ViewGroupValueFields, ViewValueAssignment} from '../../_models';
 import {ApiService} from '../../_services';
 import {AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {HttpErrorResponse} from '@angular/common/http';
 import {NbToastrService} from '@nebular/theme';
+import {XRegExp} from 'xregexp';
+
+// Hacky way to include the dependency
+// @ts-ignore
+XRegExp = require('xregexp');
 
 
 export interface ViewGroupDataFields {
@@ -29,6 +34,25 @@ function matchPasswordValidator(passwordName: string) {
 
     return matchPasswords;
 }
+
+
+function formatValidator(pattern: string, message: string) {
+    const re = XRegExp(pattern);
+    function validatorPattern(control: AbstractControl) {
+        if (!re.test(control.value)) {
+            return {
+                'pattern': {
+                    'pattern': pattern,
+                    'requiredPattern': message,
+                }
+            };
+        }
+        return null;
+    }
+
+    return validatorPattern;
+}
+
 
 class FormControlWithOriginal extends FormControl {
     public originalValue: any;
@@ -103,6 +127,12 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
                     }
                     if (field.required) {
                         validators.push(Validators.required);
+                    }
+                    if (field.type === 'text' || field.type === 'datetime') {
+                        validators.push(formatValidator(
+                            (<ViewFieldText|ViewFieldDateTime>field).format,
+                            (<ViewFieldText|ViewFieldDateTime>field).formatMessage)
+                        );
                     }
                     obj2[field.key] = new FormControlWithOriginal(fieldValue, validators);
                     if (field.type === 'password' && !field.readable) {

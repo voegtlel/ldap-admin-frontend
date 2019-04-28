@@ -28,9 +28,11 @@
               "./node_modules/font-awesome/css/font-awesome.css",
               "./node_modules/ionicons/dist/css/ionicons.css",
               "./node_modules/@nebular/theme/styles/prebuilt/default.css",
-              "./node_modules/bootstrap/dist/css/bootstrap.css",
+              "./node_modules/bootstrap/dist/css/bootstrap.css"
             ],
-            "scripts": []
+            "scripts": [
+                "./node_modules/xregexp/xregexp-all.js"
+            ]
           },
           "configurations": {
             "production": {

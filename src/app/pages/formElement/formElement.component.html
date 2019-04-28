@@ -4,11 +4,11 @@
                      [status]="submitted && formControlRef.errors ? 'danger':''"
         >{{title}}{{formControlRef.dirty ? ' *' : ''}}</nb-checkbox>
     </ng-container>
-    <ng-container *ngIf="type=='text' || type=='password'">
+    <ng-container *ngIf="type=='text' || type=='password' || type=='datetime'">
         <ng-container *ngIf="!togglePassword">
             <label [for]="formControlEl">{{title}}{{formControlRef.dirty ? ' *' : ''}}</label>
             <div class="input-group">
-                <input [type]="asText?'text':type" [formControl]="formControlRef" class="form-control"
+                <input [type]="showText?'text':'password'" [formControl]="formControlRef" class="form-control"
                        [readonly]="readonly"
                        nbInput fullWidth [placeholder]="title"
                        [status]="submitted && formControlRef.errors ? 'danger':''"
@@ -18,7 +18,7 @@
         <ng-container *ngIf="togglePassword">
             <label [for]="formControlEl">{{title}}{{formControlRef.dirty ? ' *' : ''}}</label>
             <div class="input-group">
-                <input [type]="asText?'text':type" [formControl]="formControlRef" class="form-control"
+                <input [type]="showText?'text':'password'" [formControl]="formControlRef" class="form-control"
                        [readonly]="readonly"
                        nbInput
                        [placeholder]="title" [status]="submitted && formControlRef.errors ? 'danger':''"

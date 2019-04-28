@@ -31,9 +31,17 @@
                             [submitted]="submitted"
                             type="password"
                             [title]="'Repeat ' + field.title"
-                            *ngIf="!(field.writable || (data.isNew && field.creatable))"
+                            *ngIf="!field.readable && (field.writable || (data.isNew && field.creatable))"
                         ></app-form-element>
                     </ng-container>
+                    <app-form-element
+                        *ngSwitchCase="'datetime'"
+                        [formControlRef]="form.get(field.key)"
+                        [submitted]="submitted"
+                        type="datetime"
+                        [title]="field.title"
+                        [readonly]="!(field.writable || (data.isNew && field.creatable))"
+                    ></app-form-element>
                     <app-form-element
                         *ngSwitchCase="'isMemberOf'"
                         [formControlRef]="form.get(field.key)"

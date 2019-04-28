@@ -25,12 +25,14 @@
     "@nebular/bootstrap": "^3.4.2",
     "@nebular/theme": "^3.4.2",
     "@ng-bootstrap/ng-bootstrap": "^4.1.1",
+    "@types/xregexp": "^3.0.29",
     "bootstrap": "^4.3.1",
     "core-js": "^2.5.4",
     "font-awesome": "^4.7.0",
     "ionicons": "^4.5.5",
     "nebular-icons": "^1.1.0",
     "rxjs": "~6.4.0",
+    "xregexp": "^4.2.4",
     "zone.js": "~0.8.29"
   },
   "devDependencies": {

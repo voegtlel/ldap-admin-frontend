@@ -52,7 +52,7 @@ export const authModule = NbAuthModule.forRoot({
         requestPassword: {showMessages: {success: true, error: true}},
         resetPassword: {showMessages: {success: true, error: true}},
         logout: {
-            redirectDelay: 0,
+            redirectDelay: 1,
         },
     },
 });

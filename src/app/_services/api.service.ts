@@ -16,10 +16,7 @@ export class ApiService {
     public readonly viewConfigSafe$: Observable<Views>;
 
     constructor(private http: HttpClient, private authService: NbAuthService, private env: EnvService) {
-        // authService.isAuthenticated().subscribe((user) => console.log('User:', user));
-        // authService.getToken().subscribe((token) => console.log('Token:', token));
-
-        authService.isAuthenticated().pipe(
+        authService.onAuthenticationChange().pipe(
             switchMap(
                 (isAuthenticated) => isAuthenticated ? http.get<Views>(`${env.apiUrl}/config`).pipe(first()) : of(null)
             )

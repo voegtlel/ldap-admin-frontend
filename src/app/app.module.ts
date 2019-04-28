@@ -60,6 +60,7 @@ import {ViewGroupListEditComponent} from './pages/viewGroupListEdit/viewGroupLis
 import {ViewListComponent} from './pages/viewList/viewList.component';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {FilterModelPipe} from './_pipes';
+import {HttpErrorHandler} from './_services';
 
 @NgModule({
     declarations: [
@@ -81,6 +82,7 @@ import {FilterModelPipe} from './_pipes';
         NbMenuModule.forRoot(),
         NbToastrModule.forRoot(),
         NbDialogModule.forRoot(),
+        NbDatepickerModule.forRoot(),
         authModule,
         NbActionsModule,
         NbCardModule,
@@ -102,7 +104,6 @@ import {FilterModelPipe} from './_pipes';
         NbButtonModule,
         NbInputModule,
         NbAccordionModule,
-        NbDatepickerModule,
         NbDialogModule,
         NbWindowModule,
         NbListModule,
@@ -125,8 +126,10 @@ import {FilterModelPipe} from './_pipes';
         NbPasswordAuthStrategyEndpoint,
         { provide: APP_BASE_HREF, useValue: '/' },
         { provide: HTTP_INTERCEPTORS, useClass: NbAuthJWTInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: HttpErrorHandler, multi: true },
         { provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER, useValue: function () { return false; } },
     ],
+
     bootstrap: [AppComponent]
 })
 export class AppModule {
