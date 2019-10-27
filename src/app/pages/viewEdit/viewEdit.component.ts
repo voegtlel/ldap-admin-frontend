@@ -1,9 +1,8 @@
 import {Component, OnDestroy, OnInit, QueryList, ViewChildren} from '@angular/core';
-import {map, startWith, switchMap} from 'rxjs/operators';
+import {map, startWith, switchMap, shareReplay, takeUntil} from 'rxjs/operators';
 
 import {
-    View, ViewFieldValueAny,
-    ViewGroup,
+    View, ViewGroup,
     ViewGroupMember,
     ViewGroupMemberOf,
     ViewGroupValueAny,
@@ -11,10 +10,8 @@ import {
     ViewValueAssignment
 } from '../../_models';
 import {ApiService, ListApiService, ViewValue} from '../../_services';
-import {BehaviorSubject, combineLatest, Observable, of, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, Subject} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormGroup} from '@angular/forms';
-import {shareLast} from '../../_helpers';
 import {ViewGroupFieldsEditComponent} from '../viewGroupFieldsEdit/viewGroupFieldsEdit.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {hasOwnProperty} from 'tslint/lib/utils';
@@ -46,8 +43,8 @@ export class ViewEditComponent implements OnInit, OnDestroy {
     view: View = null;
     @ViewChildren(ViewGroupFieldsEditComponent) fieldsControls: QueryList<ViewGroupFieldsEditComponent>;
     @ViewChildren(ViewGroupListEditComponent) listControls: QueryList<ViewGroupListEditComponent>;
-    private readonly subscriptions: Subscription[] = [];
     private readonly reload$ = new BehaviorSubject(null);
+    private destroyed$ = new Subject<void>();
 
     constructor(
         private api: ApiService,
@@ -66,7 +63,7 @@ export class ViewEditComponent implements OnInit, OnDestroy {
             }
         });
 
-        const primaryKeyView$ = shareLast(this.activatedRoute.paramMap.pipe(
+        const primaryKeyView$ = this.activatedRoute.paramMap.pipe(
             switchMap(params => this.api.viewConfigSafe$.pipe(map((views) => {
                     this.view = views[views.findIndex(view => view.key === params.get('view'))];
                     return {
@@ -75,9 +72,11 @@ export class ViewEditComponent implements OnInit, OnDestroy {
                     };
                 }
             ))),
-        ));
+            shareReplay(1),
+            takeUntil(this.destroyed$),
+        );
 
-        const data$ = shareLast(this.reload$.pipe(
+        const data$ = this.reload$.pipe(
             switchMap(
                 () => primaryKeyView$
             ),
@@ -85,8 +84,10 @@ export class ViewEditComponent implements OnInit, OnDestroy {
                 (primaryKeyView) => (
                     primaryKeyView.primaryKey === null ? of(NEWVALUE) : this.api.getView(primaryKeyView.view.key, primaryKeyView.primaryKey)
                 )
-            )
-        ));
+            ),
+            shareReplay(1),
+            takeUntil(this.destroyed$),
+        );
 
         this.data$ = combineLatest(primaryKeyView$, data$.pipe(startWith(null))).pipe(
             map(([primaryKeyView, data]) => primaryKeyView.view.details.map(viewGroup => {
@@ -123,14 +124,15 @@ export class ViewEditComponent implements OnInit, OnDestroy {
                     );
                 }
                 return of(entry);
-            })))
+            }))),
+            takeUntil(this.destroyed$),
         );
 
-        this.subscriptions.push(this.data$.subscribe(
+        this.data$.subscribe(
             (data) => {
                 this.loading = !(data && (data.length === 0 || data[0].value !== null || data[0].isNew));
             }
-        ));
+        );
     }
 
     onReload() {
@@ -138,7 +140,7 @@ export class ViewEditComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.subscriptions.forEach(subscription => subscription.unsubscribe());
+        this.destroyed$.next();
     }
 
     onCreate() {

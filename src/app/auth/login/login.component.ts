@@ -3,6 +3,8 @@ import {NB_AUTH_OPTIONS, NbAuthResult, NbAuthService, NbAuthSocialLink} from '@n
 import {getDeepFromObject} from '@nebular/auth/helpers';
 import {ActivatedRoute, Router} from '@angular/router';
 import {hasOwnProperty} from 'tslint/lib/utils';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-login',
@@ -21,6 +23,7 @@ export class LoginComponent {
     rememberMe = false;
 
     returnUrl = '/';
+    destroyed$ = new Subject<void>();
 
     constructor(protected service: NbAuthService,
                 @Inject(NB_AUTH_OPTIONS) protected options = {},
@@ -35,11 +38,15 @@ export class LoginComponent {
         this.socialLinks = this.getConfigValue('forms.login.socialLinks');
         this.rememberMe = this.getConfigValue('forms.login.rememberMe');
 
-        route.queryParams.subscribe(params => {
+        route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe(params => {
             if (hasOwnProperty(params, 'returnUrl')) {
                 this.returnUrl = params['returnUrl'];
             }
         });
+    }
+
+    ngOnDestroy() {
+        this.destroyed$.next()
     }
 
     login(): void {

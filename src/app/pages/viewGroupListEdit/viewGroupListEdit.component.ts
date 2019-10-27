@@ -74,7 +74,7 @@ export class ViewGroupListEditComponent implements OnChanges {
             this.available = [];
         }
         this.current = this.currentKeys.map(
-            currentKey => this.safe_value(currentKey)
+            currentKey => this.safeValue(currentKey)
         );
     }
 
@@ -150,7 +150,7 @@ export class ViewGroupListEditComponent implements OnChanges {
         }
     }
 
-    private safe_value(primaryKey: string): ViewGroupValueFields {
+    private safeValue(primaryKey: string): ViewGroupValueFields {
         if (this.data && this.data.foreignView && this.data.foreignView.data) {
             const data = this.data.foreignView.data.find(
                 entry => entry[this.data.foreignView.primaryKey] === primaryKey

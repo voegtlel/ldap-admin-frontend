@@ -1,8 +1,7 @@
 import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {map, startWith, switchMap} from 'rxjs/operators';
+import {map, startWith, switchMap, shareReplay} from 'rxjs/operators';
 import {ViewList, ViewListValue} from '../_models';
-import {shareLast} from '../_helpers';
 import {ApiService} from './api.service';
 
 
@@ -38,10 +37,11 @@ export class ListApiService {
     public getViewList(viewName: string): Observable<ViewValue> {
         if (!this.lists.hasOwnProperty(viewName)) {
             this.reloads$[viewName] = new BehaviorSubject(null);
-            this.lists[viewName] = shareLast(combineLatest(this.reload$, this.reloads$[viewName]).pipe(
+            this.lists[viewName] = combineLatest(this.reload$, this.reloads$[viewName]).pipe(
                 switchMap(() => this.api.viewConfigSafe$),
-                switchMap((views) => shareLast(this.api.getViewList(viewName)).pipe(
+                switchMap((views) => this.api.getViewList(viewName).pipe(
                     startWith(null),
+                    shareReplay(1),
                     map((data) => {
                         const view = views[views.findIndex(foreignView => foreignView.key === viewName)];
                         return {
@@ -51,9 +51,10 @@ export class ListApiService {
                             primaryKey: view.primaryKey,
                             title: view.title,
                         };
-                    })
-                ))
-            ));
+                    }),
+                )),
+                shareReplay(1),
+            );
         }
 
         return this.lists[viewName];

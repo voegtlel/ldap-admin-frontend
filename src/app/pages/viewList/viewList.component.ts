@@ -1,9 +1,9 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {first, map, switchMap} from 'rxjs/operators';
+import {first, map, switchMap, takeUntil} from 'rxjs/operators';
 
 import {View, ViewList, ViewListValue} from '../../_models';
 import {ApiService, ListApiService} from '../../_services';
-import {BehaviorSubject, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NbDialogService, NbToastrService} from '@nebular/theme';
 
@@ -21,12 +21,11 @@ export class ViewListComponent implements OnInit, OnDestroy {
     view: View;
     readonly reload$ = new BehaviorSubject(null);
     @ViewChild('deleteModalBox') deleteModalBox;
-    private readonly subscriptions: Subscription[] = [];
+    private destroyed$ = new Subject<void>();
 
     constructor(
         private api: ApiService,
         private listApi: ListApiService,
-        private router: Router,
         private activatedRoute: ActivatedRoute,
         private dialogService: NbDialogService,
         private toastrService: NbToastrService,
@@ -39,7 +38,8 @@ export class ViewListComponent implements OnInit, OnDestroy {
         this.view$ = this.activatedRoute.paramMap.pipe(
             switchMap(params => this.api.viewConfigSafe$.pipe(map((views) =>
                 views[views.findIndex(view => view.key === params.get('view'))]
-            )))
+            ))),
+            takeUntil(this.destroyed$),
         );
 
         this.fields$ = this.view$.pipe(map((view) => view.list));
@@ -56,20 +56,21 @@ export class ViewListComponent implements OnInit, OnDestroy {
             switchMap(
                 (view) => this.listApi.getViewList(view.key)
             ),
-            map(data => data.data)
+            map(data => data.data),
+            takeUntil(this.destroyed$),
         );
 
-        this.subscriptions.push(this.view$.subscribe((view) => {
+        this.view$.subscribe((view) => {
             this.view = view;
-        }));
+        });
 
-        this.subscriptions.push(this.data$.subscribe((data) => {
+        this.data$.subscribe((data) => {
             this.loading = (data === null);
-        }));
+        });
     }
 
     ngOnDestroy(): void {
-        this.subscriptions.forEach(subscription => subscription.unsubscribe());
+        this.destroyed$.next();
     }
 
     performDelete(primaryKey: string) {
@@ -92,5 +93,10 @@ export class ViewListComponent implements OnInit, OnDestroy {
                 console.log('Error:', error);
             }
         );
+    }
+
+    openDialog($event, dialogRef, context) {
+        $event.stopPropagation();
+        this.dialogService.open(dialogRef, {context});
     }
 }

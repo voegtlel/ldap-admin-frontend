@@ -24,7 +24,7 @@
                             <ng-container *ngSwitchDefault>{{value[field.key]}}</ng-container>
                         </ng-container>
                     </td>
-                    <td><a class="btn" (click)="$event.stopPropagation(); dialogService.open(deleteModalBox, {context: value[view.primaryKey]})"><i class="fa fa-remove"></i></a></td>
+                    <td><a class="btn" (click)="openDialog($event, deleteModalBox, value[view.primaryKey])"><i class="fa fa-remove"></i></a></td>
                 </tr>
             </tbody>
         </table>
