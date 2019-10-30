@@ -1,13 +1,12 @@
-import {RouterModule, Routes} from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
 
-import {HomeComponent} from './pages/home/home.component';
-import {AuthGuard} from './_guards';
-import {NbAuthComponent, NbLogoutComponent} from '@nebular/auth';
-import {PagesComponent} from './pages/pages.component';
-import {LoginComponent} from './auth/login/login.component';
-import {ViewEditComponent} from './pages/viewEdit/viewEdit.component';
-import {ViewListComponent} from './pages/viewList/viewList.component';
-
+import { HomeComponent } from './pages/home/home.component';
+import { AuthGuard } from './_guards';
+import { NbAuthComponent, NbLogoutComponent } from '@nebular/auth';
+import { PagesComponent } from './pages/pages.component';
+import { LoginComponent } from './auth/login/login.component';
+import { ViewEditComponent } from './pages/view-edit/view-edit.component';
+import { ViewListComponent } from './pages/view-list/view-list.component';
 
 const appRoutes: Routes = [
     {
@@ -31,7 +30,7 @@ const appRoutes: Routes = [
                 path: 'edit/:view',
                 component: ViewEditComponent,
             },
-        ]
+        ],
     },
 
     {
@@ -68,8 +67,8 @@ const appRoutes: Routes = [
     // otherwise redirect to home
     {
         path: '**',
-        redirectTo: ''
-    }
+        redirectTo: '',
+    },
 ];
 
 export const routing = RouterModule.forRoot(appRoutes);

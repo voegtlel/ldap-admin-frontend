@@ -1,50 +1,58 @@
 <nb-card [nbSpinner]="loading">
     <nb-card-header>
-        {{data?.view.title}}
+        {{ data?.view.title }}
         <nb-actions *ngIf="data && !data.isNew" size="small" class="float-right">
-            <nb-action icon="fa fa-refresh" (click)="reload.emit(null)"></nb-action>
-            <nb-action icon="fa fa-save" (click)="onSubmit()"></nb-action>
+            <nb-action icon="refresh" (click)="reload.emit(null)"></nb-action>
+            <nb-action icon="save" (click)="onSubmit()"></nb-action>
         </nb-actions>
     </nb-card-header>
     <nb-card-body>
         <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="data">
             <ng-container *ngFor="let field of data.view.fields">
                 <ng-container [ngSwitch]="field.type">
-                    <app-form-element
+                    <ladm-form-element
                         *ngSwitchCase="'text'"
                         [formControlRef]="form.get(field.key)"
                         [submitted]="submitted"
                         [title]="field.title"
                         [readonly]="!(field.writable || (data.isNew && field.creatable))"
-                    ></app-form-element>
+                    ></ladm-form-element>
                     <ng-container *ngSwitchCase="'password'">
-                        <app-form-element
+                        <ladm-form-element
                             [formControlRef]="form.get(field.key)"
                             [submitted]="submitted"
                             type="password"
                             [title]="field.title"
                             [readonly]="!(field.writable || (data.isNew && field.creatable))"
                             [togglePassword]="field.readable"
-                        ></app-form-element>
-                        <app-form-element
+                        ></ladm-form-element>
+                        <ladm-form-element
                             [formControlRef]="form.get('_' + field.key + 'Repeat')"
                             [submitted]="submitted"
                             type="password"
                             [title]="'Repeat ' + field.title"
-                            *ngIf="!(field.writable || (data.isNew && field.creatable))"
-                        ></app-form-element>
+                            *ngIf="!field.readable && (field.writable || (data.isNew && field.creatable))"
+                        ></ladm-form-element>
                     </ng-container>
-                    <app-form-element
+                    <ladm-form-element
+                        *ngSwitchCase="'datetime'"
+                        [formControlRef]="form.get(field.key)"
+                        [submitted]="submitted"
+                        type="datetime"
+                        [title]="field.title"
+                        [readonly]="!(field.writable || (data.isNew && field.creatable))"
+                    ></ladm-form-element>
+                    <ladm-form-element
                         *ngSwitchCase="'isMemberOf'"
                         [formControlRef]="form.get(field.key)"
                         [submitted]="submitted"
                         type="checkbox"
                         [title]="field.title"
-                    ></app-form-element>
+                    ></ladm-form-element>
                 </ng-container>
             </ng-container>
-            <div *ngIf="data && !data.isNew" class="form-group">
-                <button [disabled]="loading" class="btn btn-primary">Save</button>
+            <div *ngIf="data && !data.isNew" class="form-control-group">
+                <button nbButton [disabled]="loading">Save</button>
             </div>
         </form>
     </nb-card-body>

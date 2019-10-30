@@ -1,34 +1,43 @@
-import {ChangeDetectorRef, Component, Inject} from '@angular/core';
-import {NB_AUTH_OPTIONS, NbAuthResult, NbAuthService, NbAuthSocialLink} from '@nebular/auth';
-import {getDeepFromObject} from '@nebular/auth/helpers';
-import {Router} from '@angular/router';
+import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { NB_AUTH_OPTIONS, NbAuthResult, NbAuthService, NbAuthSocialLink, getDeepFromObject } from '@nebular/auth';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-    selector: 'app-login',
+    selector: 'ladm-login',
     templateUrl: './login.component.html',
 })
 export class LoginComponent {
-    redirectDelay: number = 0;
+    redirectDelay = 0;
     showMessages: any = {};
-    strategy: string = '';
+    strategy = '';
 
     errors: string[] = [];
     messages: string[] = [];
     user: any = {};
-    submitted: boolean = false;
+    submitted = false;
     socialLinks: NbAuthSocialLink[] = [];
     rememberMe = false;
 
-    constructor(protected service: NbAuthService,
-                @Inject(NB_AUTH_OPTIONS) protected options = {},
-                protected cd: ChangeDetectorRef,
-                protected router: Router) {
+    returnUrl = '/';
 
+    constructor(
+        protected service: NbAuthService,
+        @Inject(NB_AUTH_OPTIONS) protected options = {},
+        protected cd: ChangeDetectorRef,
+        protected router: Router,
+        private route: ActivatedRoute
+    ) {
         this.redirectDelay = this.getConfigValue('forms.login.redirectDelay');
         this.showMessages = this.getConfigValue('forms.login.showMessages');
         this.strategy = this.getConfigValue('forms.login.strategy');
         this.socialLinks = this.getConfigValue('forms.login.socialLinks');
         this.rememberMe = this.getConfigValue('forms.login.rememberMe');
+
+        route.queryParams.subscribe(params => {
+            if (params.hasOwnProperty('returnUrl')) {
+                this.returnUrl = params.returnUrl;
+            }
+        });
     }
 
     login(): void {
@@ -40,16 +49,20 @@ export class LoginComponent {
 
             if (result.isSuccess()) {
                 this.messages = result.getMessages();
+
+                // const redirect = result.getRedirect();
+                const redirect = this.returnUrl;
+                if (redirect) {
+                    setTimeout(() => {
+                        console.log('Login redirect', redirect);
+                        return this.router.navigate([redirect]);
+                        // return this.router.navigateByUrl(redirect);
+                    }, this.redirectDelay);
+                }
             } else {
                 this.errors = result.getErrors();
             }
 
-            const redirect = result.getRedirect();
-            if (redirect) {
-                setTimeout(() => {
-                    return this.router.navigateByUrl(redirect);
-                }, this.redirectDelay);
-            }
             this.cd.detectChanges();
         });
     }

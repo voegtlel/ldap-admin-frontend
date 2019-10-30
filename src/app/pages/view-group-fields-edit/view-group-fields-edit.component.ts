@@ -1,11 +1,29 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange } from '@angular/core';
 
-import {ViewGroupFields, ViewGroupValueFields, ViewValueAssignment} from '../../_models';
-import {ApiService} from '../../_services';
-import {AbstractControl, AbstractControlOptions, AsyncValidatorFn, FormControl, FormGroup, ValidatorFn, Validators} from '@angular/forms';
-import {HttpErrorResponse} from '@angular/common/http';
-import {NbToastrService} from '@nebular/theme';
+import {
+    ViewFieldDateTime,
+    ViewFieldText,
+    ViewGroupFields,
+    ViewGroupValueFields,
+    ViewValueAssignment,
+} from '../../_models';
+import { ApiService } from '../../_services';
+import {
+    AbstractControl,
+    AbstractControlOptions,
+    AsyncValidatorFn,
+    FormControl,
+    FormGroup,
+    ValidatorFn,
+    Validators,
+} from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NbToastrService } from '@nebular/theme';
+import { XRegExp } from 'xregexp';
 
+// Hacky way to include the dependency
+// @ts-ignore
+XRegExp = require('xregexp');
 
 export interface ViewGroupDataFields {
     viewName: string;
@@ -16,18 +34,34 @@ export interface ViewGroupDataFields {
     isNew: boolean;
 }
 
-
 function matchPasswordValidator(passwordName: string) {
     function matchPasswords(control: AbstractControl) {
         const password1 = control.get(passwordName);
         const password2 = control.get('_' + passwordName + 'Repeat');
         if (password1.value !== password2.value) {
-            password2.setErrors({matchPassword: true});
+            password2.setErrors({ matchPassword: true });
         }
         return null;
     }
 
     return matchPasswords;
+}
+
+function formatValidator(pattern: string, message: string) {
+    const re = XRegExp(pattern);
+    function validatorPattern(control: AbstractControl) {
+        if (!re.test(control.value)) {
+            return {
+                pattern: {
+                    pattern: pattern,
+                    requiredPattern: message,
+                },
+            };
+        }
+        return null;
+    }
+
+    return validatorPattern;
 }
 
 class FormControlWithOriginal extends FormControl {
@@ -36,12 +70,12 @@ class FormControlWithOriginal extends FormControl {
     constructor(
         formState?: any,
         validatorOrOpts?: ValidatorFn | ValidatorFn[] | AbstractControlOptions | null,
-        asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null, originalValue?: any
+        asyncValidator?: AsyncValidatorFn | AsyncValidatorFn[] | null,
+        originalValue?: any
     ) {
         super(formState, validatorOrOpts, asyncValidator);
         if (originalValue === null) {
             this.originalValue = formState;
-
         } else {
             this.originalValue = originalValue;
         }
@@ -51,15 +85,13 @@ class FormControlWithOriginal extends FormControl {
         super.markAsPristine(opts);
         this.originalValue = this.value;
     }
-
 }
 
-
 @Component({
-    selector: 'app-view-group-fields-edit',
-    templateUrl: './viewGroupFieldsEdit.component.html',
+    selector: 'ladm-view-group-fields-edit',
+    templateUrl: './view-group-fields-edit.component.html',
 })
-export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
+export class ViewGroupFieldsEditComponent implements OnChanges {
     form: FormGroup;
     @Output() loadingChange = new EventEmitter<boolean>();
     submitted = false;
@@ -68,11 +100,7 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
     @Input() data: ViewGroupDataFields;
     private _localLoading = true;
 
-    constructor(
-        private api: ApiService,
-        private toastrService: NbToastrService,
-    ) {
-    }
+    constructor(private api: ApiService, private toastrService: NbToastrService) {}
 
     private _loading = true;
 
@@ -89,9 +117,6 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
         this._loading = value;
     }
 
-    ngOnInit() {
-    }
-
     updateViews() {
         if (this.data) {
             this.form = new FormGroup(
@@ -104,12 +129,21 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
                     if (field.required) {
                         validators.push(Validators.required);
                     }
+                    if (field.type === 'text' || field.type === 'datetime') {
+                        validators.push(
+                            formatValidator(
+                                (<ViewFieldText | ViewFieldDateTime>field).format,
+                                (<ViewFieldText | ViewFieldDateTime>field).formatMessage
+                            )
+                        );
+                    }
                     obj2[field.key] = new FormControlWithOriginal(fieldValue, validators);
                     if (field.type === 'password' && !field.readable) {
                         obj2['_' + field.key + 'Repeat'] = new FormControlWithOriginal(fieldValue, validators);
                     }
                     return obj2;
-                }, {}), this.data.view.fields.reduce((validators, field) => {
+                }, {}),
+                this.data.view.fields.reduce((validators, field) => {
                     if (field.type === 'password' && !field.readable) {
                         validators.push(matchPasswordValidator(field.key));
                     }
@@ -126,7 +160,7 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
     ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
         if (changes.hasOwnProperty('data')) {
             this.updateViews();
-            this._localLoading = (!this.data || !(this.data.value || this.data.isNew));
+            this._localLoading = !this.data || !(this.data.value || this.data.isNew);
         }
     }
 
@@ -141,7 +175,7 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
             return false;
         }
 
-        this.data.view.fields.forEach((field) => {
+        this.data.view.fields.forEach(field => {
             const formField = <FormControlWithOriginal>this.form.get(field.key);
             formField.setErrors(null);
             if (formField.dirty) {
@@ -154,12 +188,12 @@ export class ViewGroupFieldsEditComponent implements OnInit, OnChanges {
         return true;
     }
 
-    public setErrors(errors: {[key: string]: string} = null) {
+    public setErrors(errors: { [key: string]: string } = null) {
         this.form.updateValueAndValidity();
         if (errors !== null) {
             Object.entries(errors).forEach(([key, err]) => {
                 if (this.form.contains(key)) {
-                    this.form.get(key).setErrors({external: err});
+                    this.form.get(key).setErrors({ external: err });
                 }
             });
         }

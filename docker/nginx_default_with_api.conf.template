@@ -23,8 +23,7 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    location /api {
-        rewrite ^/api(.*) /$1 break;
-        proxy_pass http://api;
+    location /api/ {
+        proxy_pass http://api/;
     }
 }

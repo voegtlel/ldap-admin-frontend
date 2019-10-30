@@ -1,34 +1,34 @@
 <ng-container *ngFor="let data of data$ | async">
     <ng-container [ngSwitch]="data.view.type">
         <ng-container *ngSwitchCase="'member'">
-            <app-view-group-list-edit
+            <ladm-view-group-list-edit
                 [(loading)]="loading"
                 [data]="data"
                 (reload)="onReload()"
                 (submitCreate)="onCreate()"
-            ></app-view-group-list-edit>
+            ></ladm-view-group-list-edit>
         </ng-container>
         <ng-container *ngSwitchCase="'memberOf'">
-            <app-view-group-list-edit
+            <ladm-view-group-list-edit
                 [(loading)]="loading"
                 [data]="data"
                 (reload)="onReload()"
                 (submitCreate)="onCreate()"
-            ></app-view-group-list-edit>
+            ></ladm-view-group-list-edit>
         </ng-container>
         <ng-container *ngSwitchCase="'fields'">
-            <app-view-group-fields-edit
+            <ladm-view-group-fields-edit
                 [(loading)]="loading"
                 [data]="data"
                 (reload)="onReload()"
                 (submitCreate)="onCreate()"
-            ></app-view-group-fields-edit>
+            ></ladm-view-group-fields-edit>
         </ng-container>
         <ng-container *ngSwitchDefault>
-            {{data.view.type}}
+            {{ data.view.type }}
         </ng-container>
     </ng-container>
 </ng-container>
-<div *ngIf="!(activatedRoute.paramMap | async).get('primaryKey')" class="form-group">
-    <button [disabled]="loading" class="btn btn-primary" (click)="onCreate()">Create</button>
+<div *ngIf="!(activatedRoute.paramMap | async).get('primaryKey')" class="form-control-group">
+    <button nbButton [disabled]="loading" (click)="onCreate()">Create</button>
 </div>

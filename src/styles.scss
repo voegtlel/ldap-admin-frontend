@@ -1,17 +1,15 @@
+// this is our just created themes.scss file, make sure the path to the file is correct
+@import 'themes';
+
+// framework component styles
+@import '~@nebular/theme/styles/globals';
+
+// install the framework styles
+@include nb-install() {
+    @include nb-theme-global();
+}
+
 /* You can add global styles to this file, and also import other style files */
-
-.table th.fit, .table td.fit {
-    width: 1px;
-    white-space: nowrap;
-}
-
-.table th.fit nb-action, .table td.fit nb-action {
-    padding: 0;
-}
-
-.table td.align-middle, .table th.align-middle {
-    vertical-align: middle;
-}
 
 .float-left {
     float: left;
@@ -23,4 +21,66 @@
 
 .table tr.clickable-row {
     cursor: pointer;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.table tr {
+    background-color: nb-theme(tree-grid-row-background-color);
+    color: nb-theme(tree-grid-row-text-color);
+    font: nb-theme(tree-grid-row-text-font-weight) nb-theme(tree-grid-row-text-font-size)
+        nb-theme(tree-grid-row-text-font-family);
+    line-height: nb-theme(tree-grid-row-text-line-height);
+}
+
+.table tr:nth-of-type(even) {
+    background-color: nb-theme(tree-grid-row-even-background-color);
+}
+
+.table th,
+.table td {
+    padding: nb-theme(tree-grid-cell-padding);
+    vertical-align: top;
+    border-top: nb-theme(tree-grid-cell-border-width) nb-theme(tree-grid-cell-border-style)
+        nb-theme(tree-grid-cell-border-color);
+}
+
+.table th {
+    vertical-align: bottom;
+    background-color: nb-theme(tree-grid-header-background-color);
+    color: nb-theme(tree-grid-header-text-color);
+
+    font: nb-theme(tree-grid-header-text-font-weight) nb-theme(tree-grid-header-text-font-size)
+        nb-theme(tree-grid-header-text-font-family);
+    line-height: nb-theme(tree-grid-header-text-line-height);
+    border-bottom: 2px solid;
+}
+
+.table-bordered {
+    border: nb-theme(tree-grid-cell-border-width) nb-theme(tree-grid-cell-border-style)
+        nb-theme(tree-grid-cell-border-color);
+}
+
+.table-hover tr:hover {
+    background-color: scale-color(nb-theme(tree-grid-row-hover-background-color), $lightness: -10%);
+}
+
+.table th.fit,
+.table td.fit {
+    width: 1px;
+    white-space: nowrap;
+}
+
+.table th.fit nb-action,
+.table td.fit nb-action {
+    padding: 0;
+}
+
+.table td.align-middle,
+.table th.align-middle {
+    vertical-align: middle;
 }

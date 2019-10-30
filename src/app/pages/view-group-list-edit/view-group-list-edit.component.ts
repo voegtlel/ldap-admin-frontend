@@ -1,5 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChange} from '@angular/core';
-
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange } from '@angular/core';
 
 import {
     ViewGroupMember,
@@ -8,10 +7,10 @@ import {
     ViewGroupValueMember,
     ViewGroupValueMemberOf,
     ViewListValue,
-    ViewValueAssignment
+    ViewValueAssignment,
 } from '../../_models';
-import {ApiService, ViewValue} from '../../_services';
-import {NbDialogService, NbToastrService} from '@nebular/theme';
+import { ApiService, ViewValue } from '../../_services';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
 
 export interface ViewGroupDataMember {
     viewName: string;
@@ -24,8 +23,8 @@ export interface ViewGroupDataMember {
 }
 
 @Component({
-    selector: 'app-view-group-list-edit',
-    templateUrl: './viewGroupListEdit.component.html',
+    selector: 'ladm-view-group-list-edit',
+    templateUrl: './view-group-list-edit.component.html',
 })
 export class ViewGroupListEditComponent implements OnChanges {
     @Output() reload = new EventEmitter<void>();
@@ -44,9 +43,8 @@ export class ViewGroupListEditComponent implements OnChanges {
     constructor(
         private api: ApiService,
         public dialogService: NbDialogService,
-        private toastrService: NbToastrService,
-    ) {
-    }
+        private toastrService: NbToastrService
+    ) {}
 
     private _loading = true;
 
@@ -66,16 +64,12 @@ export class ViewGroupListEditComponent implements OnChanges {
     updateCurrent() {
         if (this.data && this.data.foreignView && this.data.foreignView.data) {
             this.available = this.data.foreignView.data.filter(
-                entry => this.currentKeys.indexOf(
-                    <string>entry[this.data.foreignView.primaryKey]
-                ) === -1
+                entry => this.currentKeys.indexOf(<string>entry[this.data.foreignView.primaryKey]) === -1
             );
         } else {
             this.available = [];
         }
-        this.current = this.currentKeys.map(
-            currentKey => this.safe_value(currentKey)
-        );
+        this.current = this.currentKeys.map(currentKey => this.safeValue(currentKey));
     }
 
     ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
@@ -87,7 +81,7 @@ export class ViewGroupListEditComponent implements OnChanges {
             }
             this.updateCurrent();
         }
-        this._localLoading = (!this.data || !this.data.value || !this.data.foreignView || !this.data.foreignView.data);
+        this._localLoading = !this.data || !this.data.value || !this.data.foreignView || !this.data.foreignView.data;
     }
 
     public getFormData(entry: ViewValueAssignment): boolean {
@@ -95,8 +89,8 @@ export class ViewGroupListEditComponent implements OnChanges {
         this.error = null;
 
         entry[this.data.view.key] = {
-            'add': this.currentKeys.filter((cn) => this.data.value.indexOf(cn) === -1),
-            'delete': this.data.value.filter((cn) => this.currentKeys.indexOf(cn) === -1),
+            add: this.currentKeys.filter(cn => this.data.value.indexOf(cn) === -1),
+            delete: this.data.value.filter(cn => this.currentKeys.indexOf(cn) === -1),
         };
 
         return true;
@@ -150,7 +144,7 @@ export class ViewGroupListEditComponent implements OnChanges {
         }
     }
 
-    private safe_value(primaryKey: string): ViewGroupValueFields {
+    private safeValue(primaryKey: string): ViewGroupValueFields {
         if (this.data && this.data.foreignView && this.data.foreignView.data) {
             const data = this.data.foreignView.data.find(
                 entry => entry[this.data.foreignView.primaryKey] === primaryKey
@@ -160,7 +154,7 @@ export class ViewGroupListEditComponent implements OnChanges {
             }
         }
         const result: ViewGroupValueFields = {};
-        this.data.foreignView.view.forEach((attr) => {
+        this.data.foreignView.view.forEach(attr => {
             if (attr.key === this.data.foreignView.primaryKey) {
                 result[attr.key] = primaryKey;
             } else {

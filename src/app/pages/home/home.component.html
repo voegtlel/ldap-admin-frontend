@@ -1,13 +1,8 @@
 <nb-card *ngFor="let view of api.viewConfigSafe$ | async">
     <nb-card-header>
-        <a [routerLink]="['/list', view.key]">
-            {{view.title}}
-        </a>
+        <a [routerLink]="['/list', view.key]"><nb-icon [icon]="view.iconClasses"></nb-icon> {{ view.title }}</a>
     </nb-card-header>
     <nb-card-body>
-        <a [routerLink]="['/list', view.key]">
-            {{view.description}}
-            <i [class]="view.iconClasses"></i>
-        </a>
+        {{ view.description }}
     </nb-card-body>
 </nb-card>

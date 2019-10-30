@@ -1,8 +1,8 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HTTP_INTERCEPTORS, HttpClientModule, HttpRequest } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {
     NbAccordionModule,
@@ -38,35 +38,34 @@ import {
     NbTooltipModule,
     NbUserModule,
     NbWindowModule,
+    NbIconModule,
 } from '@nebular/theme';
 
-import {NB_AUTH_TOKEN_INTERCEPTOR_FILTER, NbAuthJWTInterceptor} from '@nebular/auth';
+import { NB_AUTH_TOKEN_INTERCEPTOR_FILTER, NbAuthJWTInterceptor } from '@nebular/auth';
 
-import {APP_BASE_HREF} from '@angular/common';
+import { APP_BASE_HREF } from '@angular/common';
 
-import {AppComponent} from './app.component';
+import { AppComponent } from './app.component';
 
-import {routing} from './app.routing';
+import { routing } from './app.routing';
 
-import {authModule, NbPasswordAuthStrategyEndpoint} from './auth/auth.module';
-import {LoginComponent} from './auth/login/login.component';
+import { DepotManAuthModule, NbPasswordAuthStrategyEndpoint } from './auth/auth.module';
 
-import {PagesComponent} from './pages/pages.component';
-import {HomeComponent} from './pages/home/home.component';
-import {ViewEditComponent} from './pages/viewEdit/viewEdit.component';
-import {FormElementComponent} from './pages/formElement/formElement.component';
-import {ViewGroupFieldsEditComponent} from './pages/viewGroupFieldsEdit/viewGroupFieldsEdit.component';
-import {ViewGroupListEditComponent} from './pages/viewGroupListEdit/viewGroupListEdit.component';
-import {ViewListComponent} from './pages/viewList/viewList.component';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {FilterModelPipe} from './_pipes';
+import { PagesComponent } from './pages/pages.component';
+import { HomeComponent } from './pages/home/home.component';
+import { ViewEditComponent } from './pages/view-edit/view-edit.component';
+import { FormElementComponent } from './pages/form-element/form-element.component';
+import { ViewGroupFieldsEditComponent } from './pages/view-group-fields-edit/view-group-fields-edit.component';
+import { ViewGroupListEditComponent } from './pages/view-group-list-edit/view-group-list-edit.component';
+import { ViewListComponent } from './pages/view-list/view-list.component';
+import { FilterModelPipe } from './_pipes';
+import { HttpErrorHandler } from './_services';
 
 @NgModule({
     declarations: [
         AppComponent,
         PagesComponent,
         HomeComponent,
-        LoginComponent,
         FormElementComponent,
         ViewEditComponent,
         ViewGroupFieldsEditComponent,
@@ -81,7 +80,8 @@ import {FilterModelPipe} from './_pipes';
         NbMenuModule.forRoot(),
         NbToastrModule.forRoot(),
         NbDialogModule.forRoot(),
-        authModule,
+        NbDatepickerModule.forRoot(),
+        DepotManAuthModule,
         NbActionsModule,
         NbCardModule,
         NbLayoutModule,
@@ -102,7 +102,6 @@ import {FilterModelPipe} from './_pipes';
         NbButtonModule,
         NbInputModule,
         NbAccordionModule,
-        NbDatepickerModule,
         NbDialogModule,
         NbWindowModule,
         NbListModule,
@@ -114,20 +113,24 @@ import {FilterModelPipe} from './_pipes';
         NbChatModule,
         NbTooltipModule,
         NbCalendarKitModule,
+        NbIconModule,
         ReactiveFormsModule,
         FormsModule,
         HttpClientModule,
         routing,
-        NgbModule,
     ],
     providers: [
         NbSidebarService,
         NbPasswordAuthStrategyEndpoint,
         { provide: APP_BASE_HREF, useValue: '/' },
         { provide: HTTP_INTERCEPTORS, useClass: NbAuthJWTInterceptor, multi: true },
-        { provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER, useValue: function () { return false; } },
+        { provide: HTTP_INTERCEPTORS, useClass: HttpErrorHandler, multi: true },
+        {
+            provide: NB_AUTH_TOKEN_INTERCEPTOR_FILTER,
+            useValue: (req: HttpRequest<any>) => req.url.endsWith('/jwt-auth'),
+        },
     ],
-    bootstrap: [AppComponent]
+
+    bootstrap: [AppComponent],
 })
-export class AppModule {
-}
+export class AppModule {}
