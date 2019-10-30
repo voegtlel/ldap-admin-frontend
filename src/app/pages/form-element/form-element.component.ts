@@ -1,13 +1,12 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {FormControl} from '@angular/forms';
-
+import { Component, Input } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
-    selector: 'app-form-element',
-    templateUrl: './formElement.component.html',
-    styleUrls: ['./formElement.component.scss'],
+    selector: 'ladm-form-element',
+    templateUrl: './form-element.component.html',
+    styleUrls: ['./form-element.component.scss'],
 })
-export class FormElementComponent implements OnInit {
+export class FormElementComponent {
     @Input() formControlRef: FormControl;
     @Input() type = 'text';
     @Input() title: string;
@@ -22,11 +21,7 @@ export class FormElementComponent implements OnInit {
         return this.type !== 'password' || this.asText;
     }
 
-    constructor() {
-    }
-
-    ngOnInit() {
-    }
+    constructor() {}
 
     get error(): string {
         if (this.formControlRef.errors) {

@@ -1,5 +1,4 @@
-import {Injectable} from '@angular/core';
-
+import { Injectable } from '@angular/core';
 
 export function getApiUrl(): string {
     const browserWindow = window || {};
@@ -10,9 +9,8 @@ export function getApiUrl(): string {
     return '/api';
 }
 
-
 @Injectable({
-    providedIn: 'root'
+    providedIn: 'root',
 })
 export class EnvService {
     public readonly apiUrl: string;

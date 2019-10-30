@@ -1,13 +1,9 @@
-import {ChangeDetectorRef, Component, Inject} from '@angular/core';
-import {NB_AUTH_OPTIONS, NbAuthResult, NbAuthService, NbAuthSocialLink} from '@nebular/auth';
-import {getDeepFromObject} from '@nebular/auth/helpers';
-import {ActivatedRoute, Router} from '@angular/router';
-import {hasOwnProperty} from 'tslint/lib/utils';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ChangeDetectorRef, Component, Inject } from '@angular/core';
+import { NB_AUTH_OPTIONS, NbAuthResult, NbAuthService, NbAuthSocialLink, getDeepFromObject } from '@nebular/auth';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
-    selector: 'app-login',
+    selector: 'ladm-login',
     templateUrl: './login.component.html',
 })
 export class LoginComponent {
@@ -23,30 +19,25 @@ export class LoginComponent {
     rememberMe = false;
 
     returnUrl = '/';
-    destroyed$ = new Subject<void>();
 
-    constructor(protected service: NbAuthService,
-                @Inject(NB_AUTH_OPTIONS) protected options = {},
-                protected cd: ChangeDetectorRef,
-                protected router: Router,
-                private route: ActivatedRoute
+    constructor(
+        protected service: NbAuthService,
+        @Inject(NB_AUTH_OPTIONS) protected options = {},
+        protected cd: ChangeDetectorRef,
+        protected router: Router,
+        private route: ActivatedRoute
     ) {
-
         this.redirectDelay = this.getConfigValue('forms.login.redirectDelay');
         this.showMessages = this.getConfigValue('forms.login.showMessages');
         this.strategy = this.getConfigValue('forms.login.strategy');
         this.socialLinks = this.getConfigValue('forms.login.socialLinks');
         this.rememberMe = this.getConfigValue('forms.login.rememberMe');
 
-        route.queryParams.pipe(takeUntil(this.destroyed$)).subscribe(params => {
-            if (hasOwnProperty(params, 'returnUrl')) {
-                this.returnUrl = params['returnUrl'];
+        route.queryParams.subscribe(params => {
+            if (params.hasOwnProperty('returnUrl')) {
+                this.returnUrl = params.returnUrl;
             }
         });
-    }
-
-    ngOnDestroy() {
-        this.destroyed$.next()
     }
 
     login(): void {

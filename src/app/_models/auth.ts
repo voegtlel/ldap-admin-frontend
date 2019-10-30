@@ -1,5 +1,5 @@
-import {AntiSpamAnswerModel} from './anti_spam';
-import {ViewGroupValueAny} from './model';
+import { AntiSpamAnswerModel } from './anti_spam';
+import { ViewGroupValueAny } from './model';
 
 export interface AuthUserModel {
     primaryKey: string;
@@ -7,7 +7,7 @@ export interface AuthUserModel {
     mail: string;
 
     // Additional fields for permissions
-    [key: string]: boolean|string;
+    [key: string]: boolean | string;
 }
 
 export interface RegisterUserModel {

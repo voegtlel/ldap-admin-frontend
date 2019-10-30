@@ -1,0 +1,86 @@
+<nb-card [nbSpinner]="loading">
+    <nb-card-header>
+        {{ data ? data.view.title : '' }}
+        <nb-actions size="small" class="float-right">
+            <nb-action icon="refresh" (click)="reload.emit(null)"></nb-action>
+            <nb-action icon="save" (click)="onSubmit()" *ngIf="!data?.isNew"></nb-action>
+            <nb-action icon="plus" (click)="dialogService.open(addModalBox)"></nb-action>
+        </nb-actions>
+    </nb-card-header>
+    <nb-card-body>
+        <table class="table table-bordered table-hover" *ngIf="data?.foreignView">
+            <thead>
+                <tr>
+                    <th class="align-middle" *ngFor="let attr of data.foreignView.view">{{ attr.title }}</th>
+                    <th class="align-middle" class="fit"></th>
+                    <th class="align-middle" class="fit"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let entry of current">
+                    <td class="align-middle" *ngFor="let attr of data.foreignView.view">
+                        <ng-container [ngSwitch]="attr.type">
+                            <ng-container *ngSwitchCase="'isMemberOf'">
+                                <label>
+                                    <input type="checkbox" [checked]="entry[attr.key]" readonly />
+                                </label>
+                            </ng-container>
+                            <ng-container *ngSwitchDefault>{{ entry[attr.key] }}</ng-container>
+                        </ng-container>
+                    </td>
+                    <td class="fit">
+                        <nb-actions>
+                            <nb-action (click)="remove(entry[data.foreignView.primaryKey])" icon="trash"></nb-action>
+                        </nb-actions>
+                    </td>
+                    <td class="fit">
+                        <nb-actions>
+                            <nb-action
+                                [routerLink]="['/edit', data.foreignView.viewName, entry[data.foreignView.primaryKey]]"
+                                icon="edit"
+                            ></nb-action>
+                        </nb-actions>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div *ngIf="error" class="invalid-feedback">
+            {{ error }}
+        </div>
+    </nb-card-body>
+</nb-card>
+
+<ng-template #addModalBox let-ref="dialogRef">
+    <nb-card>
+        <nb-card-header>
+            Add {{ data?.foreignView?.title }}
+            <input type="text" nbInput [(ngModel)]="filter" name="filter" placeholder="Filter" class="float-right" />
+        </nb-card-header>
+        <nb-card-body>
+            <table class="table table-bordered table-hover" *ngIf="data?.foreignView">
+                <tbody>
+                    <tr
+                        *ngFor="let entry of available | filterModel: filter"
+                        class="clickable-row"
+                        (click)="add(entry[data.foreignView.primaryKey]); ref.close()"
+                    >
+                        <td class="align-middle fit"><i class="plus"></i></td>
+                        <td class="align-middle" *ngFor="let attr of data.foreignView.view">
+                            <ng-container [ngSwitch]="attr.type">
+                                <ng-container *ngSwitchCase="'isMemberOf'">
+                                    <label>
+                                        <input type="checkbox" [checked]="entry[attr.key]" readonly />
+                                    </label>
+                                </ng-container>
+                                <ng-container *ngSwitchDefault>{{ entry[attr.key] }}</ng-container>
+                            </ng-container>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </nb-card-body>
+        <nb-card-footer>
+            <button nbButton class="float-right" state="warning" (click)="ref.close()">Close</button>
+        </nb-card-footer>
+    </nb-card>
+</ng-template>

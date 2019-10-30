@@ -38,7 +38,12 @@ export interface ViewFieldIsMemberOf extends ViewField {
     foreignField: string;
 }
 
-export type ViewFieldAny = ViewFieldText | ViewFieldDateTime | ViewFieldPassword | ViewFieldGenerate | ViewFieldIsMemberOf;
+export type ViewFieldAny =
+    | ViewFieldText
+    | ViewFieldDateTime
+    | ViewFieldPassword
+    | ViewFieldGenerate
+    | ViewFieldIsMemberOf;
 
 export interface ViewGroup {
     key: string;
