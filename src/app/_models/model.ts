@@ -2,11 +2,13 @@ export type ViewFieldValueText = string;
 export type ViewFieldValuePassword = string;
 export type ViewFieldValueGenerate = string;
 export type ViewFieldValueMemberOf = boolean;
+export type ViewFieldValueObjectClass = boolean;
 export type ViewFieldValueAny =
     | ViewFieldValueText
     | ViewFieldValuePassword
     | ViewFieldValueGenerate
-    | ViewFieldValueMemberOf;
+    | ViewFieldValueMemberOf
+    | ViewFieldValueObjectClass;
 
 export interface ViewGroupValueFields {
     [key: string]: ViewFieldValueAny;

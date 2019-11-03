@@ -19,8 +19,8 @@
             <tbody>
                 <tr *ngFor="let entry of current">
                     <td class="align-middle" *ngFor="let attr of data.foreignView.view">
-                        <ng-container [ngSwitch]="attr.type">
-                            <ng-container *ngSwitchCase="'isMemberOf'">
+                        <ng-container [ngSwitch]="true">
+                            <ng-container *ngSwitchCase="['isMemberOf', 'objectClass'].includes(attr.type)">
                                 <label>
                                     <input type="checkbox" [checked]="entry[attr.key]" readonly />
                                 </label>
@@ -66,8 +66,8 @@
                     >
                         <td class="align-middle fit"><i class="plus"></i></td>
                         <td class="align-middle" *ngFor="let attr of data.foreignView.view">
-                            <ng-container [ngSwitch]="attr.type">
-                                <ng-container *ngSwitchCase="'isMemberOf'">
+                            <ng-container [ngSwitch]="true">
+                                <ng-container *ngSwitchCase="['isMemberOf', 'objectClass'].includes(attr.type)">
                                     <label>
                                         <input type="checkbox" [checked]="entry[attr.key]" readonly />
                                     </label>

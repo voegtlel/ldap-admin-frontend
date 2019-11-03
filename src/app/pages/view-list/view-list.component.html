@@ -21,8 +21,8 @@
                     [routerLink]="['/edit', view.key, value[view.primaryKey]]"
                 >
                     <td *ngFor="let field of fields$ | async" class="align-middle">
-                        <ng-container [ngSwitch]="field.type">
-                            <ng-container *ngSwitchCase="'isMemberOf'">
+                        <ng-container [ngSwitch]="true">
+                            <ng-container *ngSwitchCase="['isMemberOf', 'objectClass'].includes(field.type)">
                                 <label>
                                     <nb-checkbox [checked]="value[field.key]" disabled></nb-checkbox>
                                 </label>

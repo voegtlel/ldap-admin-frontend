@@ -89,7 +89,7 @@ export class ViewListComponent implements OnInit, OnDestroy {
                     if (error.error) {
                         this.toastrService.danger(error.error.description, error.error.title);
                     } else {
-                        this.toastrService.danger(error, 'Error while saving');
+                        this.toastrService.danger(error, 'Error while deleting');
                     }
                     console.log('Error:', error);
                 }

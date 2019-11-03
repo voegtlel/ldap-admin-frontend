@@ -99,6 +99,15 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
     @Output() submitCreate = new EventEmitter<void>();
     @Input() data: ViewGroupDataFields;
     private _localLoading = true;
+    enabledControl: FormControlWithOriginal = null;
+
+    readonly defaultValues = {
+        text: '',
+        datetime: null,
+        generate: null,
+        isMemberOf: false,
+        objectClass: false,
+    };
 
     constructor(private api: ApiService, private toastrService: NbToastrService) {}
 
@@ -117,11 +126,24 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
         this._loading = value;
     }
 
+    get enabled(): boolean {
+        return !this.enabledControl || this.enabledControl.value;
+    }
+
+    get invalid(): boolean {
+        if (this.enabled) {
+            return this.form.invalid;
+        } else {
+            return this.enabledControl.invalid;
+        }
+    }
+
     updateViews() {
+        this.enabledControl = null;
         if (this.data) {
             this.form = new FormGroup(
                 this.data.view.fields.reduce((obj2, field) => {
-                    let fieldValue: string | boolean = '';
+                    let fieldValue: string | boolean = this.defaultValues[field.type];
                     const validators: ValidatorFn[] = [];
                     if (field.readable && this.data.value) {
                         fieldValue = this.data.value[field.key];
@@ -137,9 +159,17 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
                             )
                         );
                     }
-                    obj2[field.key] = new FormControlWithOriginal(fieldValue, validators);
+                    const control = new FormControlWithOriginal(fieldValue, validators);
+                    obj2[field.key] = control;
                     if (field.type === 'password' && !field.readable) {
                         obj2['_' + field.key + 'Repeat'] = new FormControlWithOriginal(fieldValue, validators);
+                    }
+                    if (field.type === 'isMemberOf' || field.type === 'objectClass') {
+                        control.markAsDirty();
+                    }
+                    if (field.key === '_enabled') {
+                        console.log('found _enabled in', this.data.viewName, this.data.view.title);
+                        this.enabledControl = control;
                     }
                     return obj2;
                 }, {}),
@@ -150,10 +180,23 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
                     return validators;
                 }, [])
             );
-            this.form.markAsUntouched();
-            this.form.markAsPristine();
+            //this.form.markAsUntouched();
+            //this.form.markAsPristine();
+            //if (this.data.isNew) {
+            //    Object.values(this.form.controls).forEach(control => control.markAsDirty());
+            //}
         } else {
             this.form = null;
+        }
+    }
+
+    onEnableChange($event) {
+        if (!$event) {
+            Object.entries(this.form.controls).forEach(([key, control]) => {
+                if (key !== '_enabled') {
+                    control.setValue(null);
+                }
+            });
         }
     }
 
@@ -167,13 +210,13 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
     public getFormData(entry: ViewValueAssignment): boolean {
         this.submitted = true;
 
-        const entryFields: ViewGroupValueFields = {};
-
         // stop here if form is invalid
-        if (this.form.invalid) {
+        if (this.invalid) {
             console.log('Form is invalid', this.form);
             return false;
         }
+
+        const entryFields: ViewGroupValueFields = {};
 
         this.data.view.fields.forEach(field => {
             const formField = <FormControlWithOriginal>this.form.get(field.key);

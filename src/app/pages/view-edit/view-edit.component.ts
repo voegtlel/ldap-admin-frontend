@@ -132,9 +132,26 @@ export class ViewEditComponent implements OnInit, OnDestroy {
             takeUntil(this.destroyed$)
         );
 
-        this.data$.subscribe(data => {
-            this.loading = !(data && (data.length === 0 || data[0].value !== null || data[0].isNew));
-        });
+        this.data$.subscribe(
+            data => {
+                this.loading = !(data && (data.length === 0 || data[0].value !== null || data[0].isNew));
+            },
+            error => {
+                if (error.error) {
+                    this.toastrService.danger(error.error.description, error.error.title);
+                    if (error.error.field) {
+                        this.fieldsControls.forEach(control =>
+                            control.setErrors(error.error.field[control.data.view.key])
+                        );
+                    }
+                } else {
+                    this.toastrService.danger(error, error.statusText);
+                }
+                console.log('Error:', error);
+                this.loading = false;
+                this.router.navigate(['/list', this.view.key], { relativeTo: this.activatedRoute });
+            }
+        );
     }
 
     onReload() {

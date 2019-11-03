@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { BehaviorSubject, EMPTY, Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { first, map, switchMap } from 'rxjs/operators';
+import { first, map, switchMap, shareReplay } from 'rxjs/operators';
 import { ViewListValue, Views, ViewDetailValue, ViewValueAssignment, AuthUserModel } from '../_models';
 import { NbAuthService } from '@nebular/auth';
 import { EnvService } from './env.service';
@@ -19,7 +19,7 @@ export class ApiService {
             .onAuthenticationChange()
             .pipe(
                 switchMap(isAuthenticated =>
-                    isAuthenticated ? http.get<Views>(`${env.apiUrl}/config`).pipe(first()) : of(null)
+                    isAuthenticated ? http.get<Views>(`${env.apiUrl}/config`).pipe(shareReplay(1)) : of(null)
                 )
             )
             .subscribe(config => {

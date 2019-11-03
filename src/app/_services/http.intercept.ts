@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { NB_AUTH_OPTIONS, NbAuthService, getDeepFromObject } from '@nebular/auth';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, first } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class HttpErrorHandler implements HttpInterceptor {
         private authService: NbAuthService,
         @Inject(NB_AUTH_OPTIONS) protected options = {}
     ) {
-        // this.authService.onAuthenticationChange().subscribe((authenticated) => this.loggedIn = authenticated);
+        this.authService.onAuthenticationChange().subscribe(authenticated => (this.loggedIn = authenticated));
     }
 
     private logout() {

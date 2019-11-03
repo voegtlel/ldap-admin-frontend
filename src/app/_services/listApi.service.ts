@@ -25,7 +25,9 @@ export class ListApiService {
 
     public reload(viewKey?: string) {
         if (viewKey) {
-            this.reloads$[viewKey].next(null);
+            if (this.reloads$.hasOwnProperty(viewKey)) {
+                this.reloads$[viewKey].next(null);
+            }
         } else {
             this.reload$.next(null);
         }
