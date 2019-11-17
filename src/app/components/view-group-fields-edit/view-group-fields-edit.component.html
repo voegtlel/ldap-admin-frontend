@@ -3,7 +3,7 @@
         {{ data?.view.title }}
         <div class="card-header-input">
             <form [formGroup]="form" *ngIf="enabledControl">
-                <nb-checkbox [formControl]="enabledControl" (checkedChange)="onEnableChange($event)"
+                <nb-checkbox [formControl]="enabledControl" (checkedChange)="onEnableChange($event)" [disabled]=""
                     >Enabled</nb-checkbox
                 >
             </form>
@@ -23,7 +23,6 @@
                             [formControlRef]="form.get(field.key)"
                             [submitted]="submitted"
                             [title]="field.title"
-                            [readonly]="!(field.writable || (data.isNew && field.creatable))"
                         ></ladm-form-element>
                         <ng-container *ngSwitchCase="'password'">
                             <ladm-form-element
@@ -31,7 +30,6 @@
                                 [submitted]="submitted"
                                 type="password"
                                 [title]="field.title"
-                                [readonly]="!(field.writable || (data.isNew && field.creatable))"
                                 [togglePassword]="field.readable"
                             ></ladm-form-element>
                             <ladm-form-element
@@ -48,7 +46,6 @@
                             [submitted]="submitted"
                             type="datetime"
                             [title]="field.title"
-                            [readonly]="!(field.writable || (data.isNew && field.creatable))"
                         ></ladm-form-element>
                         <ladm-form-element
                             *ngSwitchCase="'isMemberOf'"

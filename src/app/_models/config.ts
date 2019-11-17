@@ -65,12 +65,14 @@ export interface ViewGroupMemberOf extends ViewGroup {
     field: string;
     foreignView: string;
     foreignField: string;
+    writable: boolean;
 }
 
 export interface ViewGroupMember extends ViewGroup {
     field: string;
     foreignView: string;
     foreignField: string;
+    writable: boolean;
 }
 
 export type ViewGroupAny = ViewGroupFields | ViewGroupMemberOf | ViewGroupMember;

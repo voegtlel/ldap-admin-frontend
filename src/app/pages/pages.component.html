@@ -2,7 +2,7 @@
     <nb-layout-header fixed>Admin</nb-layout-header>
     <nb-sidebar>
         Hello {{ (authService.user$ | async)?.displayName }}!
-        <nb-menu [items]="menuItems"></nb-menu>
+        <nb-menu [items]="menuItems$ | async"></nb-menu>
     </nb-sidebar>
     <nb-layout-column><router-outlet></router-outlet></nb-layout-column>
     <nb-layout-footer>

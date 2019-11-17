@@ -164,11 +164,13 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
                     if (field.type === 'password' && !field.readable) {
                         obj2['_' + field.key + 'Repeat'] = new FormControlWithOriginal(fieldValue, validators);
                     }
-                    if (field.type === 'isMemberOf' || field.type === 'objectClass') {
+                    if (!(field.writable || (this.data.isNew && field.creatable))) {
+                        control.disable();
+                    }
+                    if ((field.type === 'isMemberOf' || field.type === 'objectClass') && this.data.isNew) {
                         control.markAsDirty();
                     }
                     if (field.key === '_enabled') {
-                        console.log('found _enabled in', this.data.viewName, this.data.view.title);
                         this.enabledControl = control;
                     }
                     return obj2;
@@ -180,11 +182,6 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
                     return validators;
                 }, [])
             );
-            //this.form.markAsUntouched();
-            //this.form.markAsPristine();
-            //if (this.data.isNew) {
-            //    Object.values(this.form.controls).forEach(control => control.markAsDirty());
-            //}
         } else {
             this.form = null;
         }
@@ -218,7 +215,7 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
 
         const entryFields: ViewGroupValueFields = {};
 
-        this.data.view.fields.forEach(field => {
+        this.data.view.fields.forEach((field) => {
             const formField = <FormControlWithOriginal>this.form.get(field.key);
             formField.setErrors(null);
             if (formField.dirty) {

@@ -33,7 +33,7 @@ export class LoginComponent {
         this.socialLinks = this.getConfigValue('forms.login.socialLinks');
         this.rememberMe = this.getConfigValue('forms.login.rememberMe');
 
-        route.queryParams.subscribe(params => {
+        route.queryParams.subscribe((params) => {
             if (params.hasOwnProperty('returnUrl')) {
                 this.returnUrl = params.returnUrl;
             }

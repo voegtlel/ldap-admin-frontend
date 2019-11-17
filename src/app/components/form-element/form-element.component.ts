@@ -10,7 +10,6 @@ export class FormElementComponent {
     @Input() formControlRef: FormControl;
     @Input() type = 'text';
     @Input() title: string;
-    @Input() readonly = false;
 
     @Input() submitted: boolean;
 

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@angular/core';
 import { NB_AUTH_OPTIONS, NbAuthService, getDeepFromObject } from '@nebular/auth';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, first } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class HttpErrorHandler implements HttpInterceptor {
         private authService: NbAuthService,
         @Inject(NB_AUTH_OPTIONS) protected options = {}
     ) {
-        this.authService.onAuthenticationChange().subscribe(authenticated => (this.loggedIn = authenticated));
+        this.authService.onAuthenticationChange().subscribe((authenticated) => (this.loggedIn = authenticated));
     }
 
     private logout() {
@@ -33,7 +33,7 @@ export class HttpErrorHandler implements HttpInterceptor {
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(req).pipe(
-            catchError(err => {
+            catchError((err) => {
                 if (err.status === 401) {
                     console.log('ERROR: Retrieved 401 unauthenticated. Logging out.');
                     // auto logout if 401 response returned from api
@@ -41,7 +41,7 @@ export class HttpErrorHandler implements HttpInterceptor {
                     // noinspection JSDeprecatedSymbols
                     // location.reload(true);
                 } else if (err.status === 403) {
-                    console.log('ERROR: Retrieved 401 error. Reloading page.');
+                    console.log('ERROR: Retrieved 403 error. Reloading page.');
                     // noinspection JSDeprecatedSymbols
                     location.reload();
                 }

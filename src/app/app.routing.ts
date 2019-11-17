@@ -2,7 +2,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { HomeComponent } from './pages/home/home.component';
 import { AuthGuard } from './_guards';
-import { NbAuthComponent, NbLogoutComponent } from '@nebular/auth';
+import {
+    NbAuthComponent,
+    NbLogoutComponent,
+    NbResetPasswordComponent,
+    NbRequestPasswordComponent,
+} from '@nebular/auth';
 import { PagesComponent } from './pages/pages.component';
 import { LoginComponent } from './auth/login/login.component';
 import { ViewEditComponent } from './pages/view-edit/view-edit.component';
@@ -53,14 +58,14 @@ const appRoutes: Routes = [
                 path: 'logout',
                 component: NbLogoutComponent,
             },
-            /*{
+            {
                 path: 'request-password',
                 component: NbRequestPasswordComponent,
             },
             {
                 path: 'reset-password',
                 component: NbResetPasswordComponent,
-            },*/
+            },
         ],
     },
 

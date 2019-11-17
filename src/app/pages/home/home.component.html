@@ -1,8 +1,24 @@
-<nb-card *ngFor="let view of api.viewConfigSafe$ | async">
-    <nb-card-header>
-        <a [routerLink]="['/list', view.key]"><nb-icon [icon]="view.iconClasses"></nb-icon> {{ view.title }}</a>
-    </nb-card-header>
-    <nb-card-body>
-        {{ view.description }}
-    </nb-card-body>
-</nb-card>
+<ng-container *ngFor="let view of views$ | async">
+    <ng-container *ngIf="view.self">
+        <nb-card>
+            <nb-card-header>
+                <a [routerLink]="['/edit', view.key, 'self']"><nb-icon [icon]="view.iconClasses"></nb-icon> Self</a>
+            </nb-card-header>
+            <nb-card-body>
+                Edit self
+            </nb-card-body>
+        </nb-card>
+    </ng-container>
+</ng-container>
+<ng-container *ngFor="let view of views$ | async">
+    <ng-container *ngIf="view.isPermitted">
+        <nb-card>
+            <nb-card-header>
+                <a [routerLink]="['/list', view.key]"><nb-icon [icon]="view.iconClasses"></nb-icon> {{ view.title }}</a>
+            </nb-card-header>
+            <nb-card-body>
+                {{ view.description }}
+            </nb-card-body>
+        </nb-card>
+    </ng-container>
+</ng-container>

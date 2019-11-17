@@ -16,8 +16,8 @@ export interface ViewGroupValueFields {
 
 export type ViewListValue = ViewGroupValueFields[];
 
-export type ViewGroupValueMemberOf = string[];
-export type ViewGroupValueMember = string[];
+export type ViewGroupValueMemberOf = ViewListValue;
+export type ViewGroupValueMember = ViewListValue;
 export type ViewGroupValueAny = ViewGroupValueFields | ViewGroupValueMemberOf | ViewGroupValueMember;
 
 export interface ViewDetailValue {

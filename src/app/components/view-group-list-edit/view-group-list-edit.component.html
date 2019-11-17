@@ -3,22 +3,22 @@
         {{ data ? data.view.title : '' }}
         <nb-actions size="small" class="float-right">
             <nb-action icon="refresh" (click)="reload.emit(null)"></nb-action>
-            <nb-action icon="save" (click)="onSubmit()" *ngIf="!data?.isNew"></nb-action>
-            <nb-action icon="plus" (click)="dialogService.open(addModalBox)"></nb-action>
+            <nb-action icon="save" (click)="onSubmit()" *ngIf="!data?.isNew && data?.view.writable"></nb-action>
+            <nb-action icon="plus" (click)="openAddDialog($event, addModalBox)" *ngIf="data?.view.writable"></nb-action>
         </nb-actions>
     </nb-card-header>
     <nb-card-body>
         <table class="table table-bordered table-hover" *ngIf="data?.foreignView">
             <thead>
                 <tr>
-                    <th class="align-middle" *ngFor="let attr of data.foreignView.view">{{ attr.title }}</th>
+                    <th class="align-middle" *ngFor="let attr of data.foreignView.list">{{ attr.title }}</th>
                     <th class="align-middle" class="fit"></th>
                     <th class="align-middle" class="fit"></th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let entry of current">
-                    <td class="align-middle" *ngFor="let attr of data.foreignView.view">
+                    <td class="align-middle" *ngFor="let attr of data.foreignView.list">
                         <ng-container [ngSwitch]="true">
                             <ng-container *ngSwitchCase="['isMemberOf', 'objectClass'].includes(attr.type)">
                                 <label>
@@ -30,13 +30,14 @@
                     </td>
                     <td class="fit">
                         <nb-actions>
-                            <nb-action (click)="remove(entry[data.foreignView.primaryKey])" icon="trash"></nb-action>
+                            <nb-action *ngIf="data?.view.writable" (click)="remove(entry)" icon="trash"></nb-action>
                         </nb-actions>
                     </td>
                     <td class="fit">
                         <nb-actions>
                             <nb-action
-                                [routerLink]="['/edit', data.foreignView.viewName, entry[data.foreignView.primaryKey]]"
+                                *ngIf="data?.foreignView.details"
+                                [routerLink]="['/edit', data.foreignView.key, entry[data.foreignView.primaryKey]]"
                                 icon="edit"
                             ></nb-action>
                         </nb-actions>
@@ -50,22 +51,22 @@
     </nb-card-body>
 </nb-card>
 
-<ng-template #addModalBox let-ref="dialogRef">
+<ng-template #addModalBox let-data let-ref="dialogRef">
     <nb-card>
         <nb-card-header>
-            Add {{ data?.foreignView?.title }}
+            Add {{ data.title }}
             <input type="text" nbInput [(ngModel)]="filter" name="filter" placeholder="Filter" class="float-right" />
         </nb-card-header>
         <nb-card-body>
-            <table class="table table-bordered table-hover" *ngIf="data?.foreignView">
+            <table class="table table-bordered table-hover">
                 <tbody>
                     <tr
-                        *ngFor="let entry of available | filterModel: filter"
+                        *ngFor="let entry of data.available$ | async | filterModel: filter"
                         class="clickable-row"
-                        (click)="add(entry[data.foreignView.primaryKey]); ref.close()"
+                        (click)="add(entry); ref.close()"
                     >
-                        <td class="align-middle fit"><i class="plus"></i></td>
-                        <td class="align-middle" *ngFor="let attr of data.foreignView.view">
+                        <td class="align-middle fit"><nb-icon icon="plus"></nb-icon></td>
+                        <td class="align-middle" *ngFor="let attr of data.view.list">
                             <ng-container [ngSwitch]="true">
                                 <ng-container *ngSwitchCase="['isMemberOf', 'objectClass'].includes(attr.type)">
                                     <label>

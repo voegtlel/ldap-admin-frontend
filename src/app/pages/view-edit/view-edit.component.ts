@@ -10,13 +10,15 @@ import {
     ViewGroupValueFields,
     ViewValueAssignment,
     ViewDetailValue,
+    ViewDetails,
+    ViewList,
 } from '../../_models';
-import { ApiService, ListApiService, ViewValue } from '../../_services';
+import { ApiService, ListApiService } from '../../_services';
 import { BehaviorSubject, combineLatest, Observable, of, Subject } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ViewGroupFieldsEditComponent } from '../view-group-fields-edit/view-group-fields-edit.component';
+import { ViewGroupFieldsEditComponent } from '../../components/view-group-fields-edit/view-group-fields-edit.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ViewGroupListEditComponent } from '../view-group-list-edit/view-group-list-edit.component';
+import { ViewGroupListEditComponent } from '../../components/view-group-list-edit/view-group-list-edit.component';
 import { NbToastrService } from '@nebular/theme';
 
 const NEWVALUE: ViewDetailValue = {};
@@ -29,7 +31,7 @@ export interface ViewGroupData {
 
     isNew: boolean;
 
-    foreignView?: ViewValue;
+    foreignView?: View;
 }
 
 @Component({
@@ -62,13 +64,21 @@ export class ViewEditComponent implements OnInit, OnDestroy {
         });
 
         const primaryKeyView$ = this.activatedRoute.paramMap.pipe(
-            switchMap(params =>
+            switchMap((params) =>
                 this.api.viewConfigSafe$.pipe(
-                    map(views => {
-                        this.view = views[views.findIndex(view => view.key === params.get('view'))];
+                    map((views) => {
+                        const view = views.find((view) => view.key === params.get('view'));
+                        const primaryKey = params.get('primaryKey');
+                        let details: ViewDetails;
+                        if (primaryKey === 'self') {
+                            details = view.self;
+                        } else {
+                            details = view.details;
+                        }
                         return {
                             primaryKey: params.get('primaryKey'),
-                            view: this.view,
+                            view: view,
+                            details: details,
                         };
                     })
                 )
@@ -77,70 +87,65 @@ export class ViewEditComponent implements OnInit, OnDestroy {
             takeUntil(this.destroyed$)
         );
 
+        primaryKeyView$.subscribe(({ view }) => (this.view = view));
+
         const data$ = this.reload$.pipe(
             switchMap(() => primaryKeyView$),
-            switchMap(primaryKeyView =>
-                primaryKeyView.primaryKey === null
-                    ? of(NEWVALUE)
-                    : this.api.getView(primaryKeyView.view.key, primaryKeyView.primaryKey)
+            switchMap(({ view, primaryKey }) =>
+                primaryKey === null ? of(NEWVALUE) : this.api.getView(view.key, primaryKey)
             ),
             shareReplay(1),
             takeUntil(this.destroyed$)
         );
 
-        this.data$ = combineLatest([primaryKeyView$, data$.pipe(startWith(<ViewDetailValue>null))]).pipe(
-            map(([primaryKeyView, data]) =>
-                primaryKeyView.view.details.map(viewGroup => {
+        this.data$ = combineLatest([
+            primaryKeyView$,
+            data$.pipe(startWith(<ViewDetailValue>null)),
+            this.api.viewConfigSafe$,
+        ]).pipe(
+            map(([{ view, primaryKey, details }, data, views]) =>
+                details.map((viewGroup) => {
+                    let value: ViewGroupValueAny;
+                    if (data === null || data === NEWVALUE) {
+                        if (viewGroup.type === 'member' || viewGroup.type === 'memberOf') {
+                            value = [];
+                        } else {
+                            value = null;
+                        }
+                    } else {
+                        value = data[viewGroup.key];
+                    }
+
+                    let foreignView: View;
+                    if (viewGroup.type === 'member' || viewGroup.type === 'memberOf') {
+                        const viewName = (<ViewGroupMember | ViewGroupMemberOf>viewGroup).foreignView;
+                        foreignView = views.find((foreignView) => foreignView.key === viewName);
+                    } else {
+                        foreignView = undefined;
+                    }
+
                     return {
-                        primaryKey: primaryKeyView.primaryKey,
-                        viewName: primaryKeyView.view.key,
+                        primaryKey,
+                        viewName: view.key,
                         view: viewGroup,
-                        value:
-                            data === null || data === NEWVALUE
-                                ? viewGroup.type === 'member' || viewGroup.type === 'memberOf'
-                                    ? []
-                                    : null
-                                : data[viewGroup.key],
+                        value,
                         isNew: data === NEWVALUE,
+                        foreignView,
                     };
                 })
-            ),
-            switchMap(entries =>
-                combineLatest(
-                    entries.map(entry => {
-                        if (entry.view.type === 'member' || entry.view.type === 'memberOf') {
-                            return this.listApi
-                                .getViewList((<ViewGroupMember | ViewGroupMemberOf>entry.view).foreignView)
-                                .pipe(
-                                    map(foreignViewValue => {
-                                        return {
-                                            primaryKey: entry.primaryKey,
-                                            viewName: entry.viewName,
-                                            view: entry.view,
-                                            value: entry.value,
-                                            isNew: entry.isNew,
-                                            foreignView: foreignViewValue,
-                                        };
-                                    }),
-                                    startWith(<ViewGroupData>null)
-                                );
-                        }
-                        return of(entry);
-                    })
-                )
             ),
             takeUntil(this.destroyed$)
         );
 
         this.data$.subscribe(
-            data => {
+            (data) => {
                 this.loading = !(data && (data.length === 0 || data[0].value !== null || data[0].isNew));
             },
-            error => {
+            (error) => {
                 if (error.error) {
                     this.toastrService.danger(error.error.description, error.error.title);
                     if (error.error.field) {
-                        this.fieldsControls.forEach(control =>
+                        this.fieldsControls.forEach((control) =>
                             control.setErrors(error.error.field[control.data.view.key])
                         );
                     }
@@ -164,14 +169,14 @@ export class ViewEditComponent implements OnInit, OnDestroy {
 
     onCreate() {
         const entry: ViewValueAssignment = {};
-        if (this.fieldsControls.some(control => !control.getFormData(entry))) {
+        if (this.fieldsControls.some((control) => !control.getFormData(entry))) {
             return;
         }
-        if (this.listControls.some(control => !control.getFormData(entry))) {
+        if (this.listControls.some((control) => !control.getFormData(entry))) {
             return;
         }
 
-        const primaryKeyContainer = Object.values(entry).find(val => val.hasOwnProperty(this.view.primaryKey));
+        const primaryKeyContainer = Object.values(entry).find((val) => val.hasOwnProperty(this.view.primaryKey));
         const primaryKey = (<ViewGroupValueFields>primaryKeyContainer)[this.view.primaryKey];
 
         this.loading = true;
@@ -187,7 +192,7 @@ export class ViewEditComponent implements OnInit, OnDestroy {
                 if (error.error) {
                     this.toastrService.danger(error.error.description, error.error.title);
                     if (error.error.field) {
-                        this.fieldsControls.forEach(control =>
+                        this.fieldsControls.forEach((control) =>
                             control.setErrors(error.error.field[control.data.view.key])
                         );
                     }
