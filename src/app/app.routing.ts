@@ -2,16 +2,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { HomeComponent } from './pages/home/home.component';
 import { AuthGuard } from './_guards';
-import {
-    NbAuthComponent,
-    NbLogoutComponent,
-    NbResetPasswordComponent,
-    NbRequestPasswordComponent,
-} from '@nebular/auth';
+import { NbAuthComponent, NbLogoutComponent, NbRequestPasswordComponent } from '@nebular/auth';
 import { PagesComponent } from './pages/pages.component';
 import { LoginComponent } from './auth/login/login.component';
 import { ViewEditComponent } from './pages/view-edit/view-edit.component';
 import { ViewListComponent } from './pages/view-list/view-list.component';
+import { TokenLoginComponent } from './pages/token-login/token-login.component';
 
 const appRoutes: Routes = [
     {
@@ -63,9 +59,13 @@ const appRoutes: Routes = [
                 component: NbRequestPasswordComponent,
             },
             {
+                path: 'token-login',
+                component: TokenLoginComponent,
+            },
+            /*{
                 path: 'reset-password',
                 component: NbResetPasswordComponent,
-            },
+            },*/
         ],
     },
 

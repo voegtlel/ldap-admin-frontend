@@ -58,6 +58,7 @@ import { FormElementComponent } from './components/form-element/form-element.com
 import { ViewGroupFieldsEditComponent } from './components/view-group-fields-edit/view-group-fields-edit.component';
 import { ViewGroupListEditComponent } from './components/view-group-list-edit/view-group-list-edit.component';
 import { ViewListComponent } from './pages/view-list/view-list.component';
+import { TokenLoginComponent } from './pages/token-login/token-login.component';
 import { FilterModelPipe } from './_pipes';
 import { HttpErrorHandler } from './_services';
 
@@ -72,6 +73,7 @@ import { HttpErrorHandler } from './_services';
         ViewGroupListEditComponent,
         ViewListComponent,
         FilterModelPipe,
+        TokenLoginComponent,
     ],
     imports: [
         BrowserModule,
