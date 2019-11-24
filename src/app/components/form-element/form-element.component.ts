@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { EnumOption } from 'src/app/_models';
 
 @Component({
     selector: 'ladm-form-element',
@@ -10,6 +11,7 @@ export class FormElementComponent {
     @Input() formControlRef: FormControl;
     @Input() type = 'text';
     @Input() title: string;
+    @Input() enum: EnumOption[];
 
     @Input() submitted: boolean;
 

@@ -5,7 +5,7 @@
         }}</nb-checkbox>
     </ng-container>
     <ng-container *ngIf="type == 'text' || type == 'password' || type == 'datetime'">
-        <ng-container *ngIf="!togglePassword">
+        <ng-container *ngIf="!togglePassword && !enum">
             <label class="label" [for]="formControlEl">{{ title }}</label>
             <div class="input-group">
                 <input
@@ -18,6 +18,22 @@
                     [status]="submitted && formControlRef.errors ? 'danger' : ''"
                     #formControlEl
                 />
+            </div>
+        </ng-container>
+        <ng-container *ngIf="enum">
+            <label class="label" [for]="formControlEl">{{ title }}</label>
+            <div class="input-group">
+                <nb-select
+                    [formControl]="formControlRef"
+                    class="form-control"
+                    fullWidth
+                    [placeholder]="title"
+                    [status]="submitted && formControlRef.errors ? 'danger' : ''"
+                    #formControlEl
+                >
+                    <nb-option>Reset</nb-option>
+                    <nb-option *ngFor="let option of enum" [value]="option.value">{{ option.title }}</nb-option>
+                </nb-select>
             </div>
         </ng-container>
         <ng-container *ngIf="togglePassword">

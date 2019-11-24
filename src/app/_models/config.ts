@@ -8,10 +8,16 @@ export interface ViewField {
     writable: boolean;
 }
 
+export interface EnumOption {
+    title: string;
+    value: string;
+}
+
 export interface ViewFieldText extends ViewField {
     field: string;
     format: string;
     formatMessage: string;
+    enum?: EnumOption[];
 }
 
 export interface ViewFieldDateTime extends ViewField {

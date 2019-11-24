@@ -23,6 +23,7 @@
                             [formControlRef]="form.get(field.key)"
                             [submitted]="submitted"
                             [title]="field.title"
+                            [enum]="field.enum"
                         ></ladm-form-element>
                         <ng-container *ngSwitchCase="'password'">
                             <ladm-form-element
