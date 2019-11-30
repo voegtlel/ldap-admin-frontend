@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange, OnDestroy } from '@angular/core';
 
 import {
     ViewGroupMember,
@@ -8,9 +8,12 @@ import {
     ViewGroupValueMemberOf,
     ViewListValue,
     ViewValueAssignment,
+    View,
 } from '../../_models';
-import { ApiService, ViewValue } from '../../_services';
+import { ApiService, ListApiService } from '../../_services';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { takeUntil, shareReplay, map } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 export interface ViewGroupDataMember {
     viewName: string;
@@ -19,22 +22,21 @@ export interface ViewGroupDataMember {
     value: ViewGroupValueMemberOf | ViewGroupValueMember;
     isNew: boolean;
 
-    foreignView: ViewValue;
+    foreignView: View;
 }
 
 @Component({
     selector: 'ladm-view-group-list-edit',
     templateUrl: './view-group-list-edit.component.html',
 })
-export class ViewGroupListEditComponent implements OnChanges {
+export class ViewGroupListEditComponent implements OnChanges, OnDestroy {
+    private destroyed$ = new Subject<void>();
     @Output() reload = new EventEmitter<void>();
     @Output() submitCreate = new EventEmitter<void>();
     @Output() loadingChange = new EventEmitter<boolean>();
     error: string = null;
     submitted = false;
-    available: ViewListValue;
     current: ViewListValue;
-    currentKeys: string[] = [];
     @Input() data: ViewGroupDataMember = null;
     private _localLoading = true;
 
@@ -42,7 +44,8 @@ export class ViewGroupListEditComponent implements OnChanges {
 
     constructor(
         private api: ApiService,
-        public dialogService: NbDialogService,
+        private listApi: ListApiService,
+        private dialogService: NbDialogService,
         private toastrService: NbToastrService
     ) {}
 
@@ -61,36 +64,43 @@ export class ViewGroupListEditComponent implements OnChanges {
         this._loading = value;
     }
 
-    updateCurrent() {
-        if (this.data && this.data.foreignView && this.data.foreignView.data) {
-            this.available = this.data.foreignView.data.filter(
-                entry => this.currentKeys.indexOf(<string>entry[this.data.foreignView.primaryKey]) === -1
-            );
-        } else {
-            this.available = [];
-        }
-        this.current = this.currentKeys.map(currentKey => this.safeValue(currentKey));
-    }
-
     ngOnChanges(changes: { [propKey: string]: SimpleChange }) {
         if (changes.hasOwnProperty('data')) {
-            if (this.data && this.data.value) {
-                this.currentKeys = this.data.value.slice(0);
-            } else {
-                this.currentKeys = [];
-            }
-            this.updateCurrent();
+            this.current = this.data.value.slice(0);
         }
-        this._localLoading = !this.data || !this.data.value || !this.data.foreignView || !this.data.foreignView.data;
+        this._localLoading = !this.data || !this.data.value || !this.data.foreignView;
+    }
+
+    openAddDialog($event, dialogRef) {
+        $event.stopPropagation();
+        const pk = this.data.foreignView.primaryKey;
+        const context = {
+            available$: this.listApi
+                .getViewList((<ViewGroupMember | ViewGroupMemberOf>this.data.view).foreignView)
+                .pipe(
+                    map((data) =>
+                        data.filter((entry) => !this.current.some((checkEntry) => checkEntry[pk] === entry[pk]))
+                    ),
+                    shareReplay(1),
+                    takeUntil(this.destroyed$)
+                ),
+            view: this.data.foreignView,
+        };
+        this.dialogService.open(dialogRef, { context });
     }
 
     public getFormData(entry: ViewValueAssignment): boolean {
         this.submitted = true;
         this.error = null;
+        const pk = this.data.foreignView.primaryKey;
 
         entry[this.data.view.key] = {
-            add: this.currentKeys.filter(cn => this.data.value.indexOf(cn) === -1),
-            delete: this.data.value.filter(cn => this.currentKeys.indexOf(cn) === -1),
+            add: this.current
+                .filter((entry) => !this.data.value.some((checkEntry) => checkEntry[pk] === entry[pk]))
+                .map((entry) => <string>entry[pk]),
+            delete: this.data.value
+                .filter((entry) => !this.current.some((checkEntry) => checkEntry[pk] === entry[pk]))
+                .map((entry) => <string>entry[pk]),
         };
 
         return true;
@@ -115,7 +125,7 @@ export class ViewGroupListEditComponent implements OnChanges {
             () => {
                 this.reload.emit();
             },
-            error => {
+            (error) => {
                 if (error.error) {
                     this.toastrService.danger(error.error.description, error.error.title || 'Cannot Save');
                     this.error = error.error.description;
@@ -129,38 +139,22 @@ export class ViewGroupListEditComponent implements OnChanges {
         return false;
     }
 
-    add(pk: string) {
-        if (this.currentKeys.indexOf(pk) === -1) {
-            this.currentKeys.push(pk);
-            this.updateCurrent();
+    ngOnDestroy() {
+        this.destroyed$.next();
+    }
+
+    add(entry: ViewGroupValueFields) {
+        const pk = this.data.foreignView.primaryKey;
+        if (!this.current.some((checkEntry) => checkEntry[pk] === entry[pk])) {
+            this.current.push(entry);
         }
     }
 
-    remove(pk: string) {
-        const idx = this.currentKeys.indexOf(pk);
+    remove(entry: ViewGroupValueFields) {
+        const pk = this.data.foreignView.primaryKey;
+        const idx = this.current.findIndex((checkEntry) => checkEntry[pk] === entry[pk]);
         if (idx !== -1) {
-            this.currentKeys.splice(idx, 1);
-            this.updateCurrent();
+            this.current.splice(idx, 1);
         }
-    }
-
-    private safeValue(primaryKey: string): ViewGroupValueFields {
-        if (this.data && this.data.foreignView && this.data.foreignView.data) {
-            const data = this.data.foreignView.data.find(
-                entry => entry[this.data.foreignView.primaryKey] === primaryKey
-            );
-            if (data !== undefined && data !== null) {
-                return data;
-            }
-        }
-        const result: ViewGroupValueFields = {};
-        this.data.foreignView.view.forEach(attr => {
-            if (attr.key === this.data.foreignView.primaryKey) {
-                result[attr.key] = primaryKey;
-            } else {
-                result[attr.key] = null;
-            }
-        });
-        return result;
     }
 }

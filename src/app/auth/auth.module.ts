@@ -61,6 +61,13 @@ export class NbPasswordAuthStrategyEndpoint extends NbPasswordAuthStrategy {
                 NbPasswordAuthStrategyEndpoint.setup({
                     name: 'email',
                     baseEndpoint: '',
+                    requestPass: {
+                        endpoint: '/mail-login',
+                        defaultErrors: ['Invalid e-mail address.'],
+                        defaultMessages: ['Login link sent to your e-mail address.'],
+                        requireValidToken: false,
+                        redirect: { success: null, failure: null },
+                    },
                     refreshToken: {
                         endpoint: '/refresh-token',
                         defaultErrors: ['Username/password combination is not correct, please try again.'],

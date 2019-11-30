@@ -8,10 +8,16 @@ export interface ViewField {
     writable: boolean;
 }
 
+export interface EnumOption {
+    title: string;
+    value: string;
+}
+
 export interface ViewFieldText extends ViewField {
     field: string;
     format: string;
     formatMessage: string;
+    enum?: EnumOption[];
 }
 
 export interface ViewFieldDateTime extends ViewField {
@@ -38,12 +44,18 @@ export interface ViewFieldIsMemberOf extends ViewField {
     foreignField: string;
 }
 
+export interface ViewFieldObjectClass extends ViewField {
+    field: string;
+    objectClass: string;
+}
+
 export type ViewFieldAny =
     | ViewFieldText
     | ViewFieldDateTime
     | ViewFieldPassword
     | ViewFieldGenerate
-    | ViewFieldIsMemberOf;
+    | ViewFieldIsMemberOf
+    | ViewFieldObjectClass;
 
 export interface ViewGroup {
     key: string;
@@ -59,12 +71,14 @@ export interface ViewGroupMemberOf extends ViewGroup {
     field: string;
     foreignView: string;
     foreignField: string;
+    writable: boolean;
 }
 
 export interface ViewGroupMember extends ViewGroup {
     field: string;
     foreignView: string;
     foreignField: string;
+    writable: boolean;
 }
 
 export type ViewGroupAny = ViewGroupFields | ViewGroupMemberOf | ViewGroupMember;

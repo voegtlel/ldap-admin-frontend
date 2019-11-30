@@ -5,6 +5,7 @@ export interface AuthUserModel {
     primaryKey: string;
     displayName: string;
     mail: string;
+    language: string;
 
     // Additional fields for permissions
     [key: string]: boolean | string;

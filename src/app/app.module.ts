@@ -54,10 +54,11 @@ import { DepotManAuthModule, NbPasswordAuthStrategyEndpoint } from './auth/auth.
 import { PagesComponent } from './pages/pages.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ViewEditComponent } from './pages/view-edit/view-edit.component';
-import { FormElementComponent } from './pages/form-element/form-element.component';
-import { ViewGroupFieldsEditComponent } from './pages/view-group-fields-edit/view-group-fields-edit.component';
-import { ViewGroupListEditComponent } from './pages/view-group-list-edit/view-group-list-edit.component';
+import { FormElementComponent } from './components/form-element/form-element.component';
+import { ViewGroupFieldsEditComponent } from './components/view-group-fields-edit/view-group-fields-edit.component';
+import { ViewGroupListEditComponent } from './components/view-group-list-edit/view-group-list-edit.component';
 import { ViewListComponent } from './pages/view-list/view-list.component';
+import { TokenLoginComponent } from './pages/token-login/token-login.component';
 import { FilterModelPipe } from './_pipes';
 import { HttpErrorHandler } from './_services';
 
@@ -72,6 +73,7 @@ import { HttpErrorHandler } from './_services';
         ViewGroupListEditComponent,
         ViewListComponent,
         FilterModelPipe,
+        TokenLoginComponent,
     ],
     imports: [
         BrowserModule,
