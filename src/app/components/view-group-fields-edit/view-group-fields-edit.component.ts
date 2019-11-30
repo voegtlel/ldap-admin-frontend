@@ -50,7 +50,7 @@ function matchPasswordValidator(passwordName: string) {
 function formatValidator(pattern: string, message: string) {
     const re = XRegExp(pattern);
     function validatorPattern(control: AbstractControl) {
-        if (!re.test(control.value)) {
+        if (control.value && !re.test(control.value)) {
             return {
                 pattern: {
                     pattern: pattern,
@@ -215,7 +215,7 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
 
         const entryFields: ViewGroupValueFields = {};
 
-        this.data.view.fields.forEach((field) => {
+        this.data.view.fields.forEach(field => {
             const formField = <FormControlWithOriginal>this.form.get(field.key);
             formField.setErrors(null);
             if (formField.dirty) {

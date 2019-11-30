@@ -41,10 +41,10 @@ export class PagesComponent implements OnInit, OnDestroy {
                 ]
                     .concat(
                         views
-                            .filter((view) => view.self)
-                            .map((view) => {
+                            .filter(view => view.self)
+                            .map(view => {
                                 return {
-                                    title: view.title + ' Self',
+                                    title: 'Self',
                                     link: '/edit/' + view.key + '/self',
                                     icon: view.iconClasses,
                                 };
@@ -52,8 +52,8 @@ export class PagesComponent implements OnInit, OnDestroy {
                     )
                     .concat(
                         views
-                            .filter((view) => view.permissions.some((permission) => user[permission]))
-                            .map((view) => {
+                            .filter(view => view.permissions.some(permission => user[permission]))
+                            .map(view => {
                                 return {
                                     title: view.title,
                                     link: '/list/' + view.key,
