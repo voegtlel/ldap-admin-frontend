@@ -6,6 +6,7 @@ export interface ViewField {
     creatable: boolean;
     readable: boolean;
     writable: boolean;
+    hidden: boolean;
 }
 
 export interface EnumOption {

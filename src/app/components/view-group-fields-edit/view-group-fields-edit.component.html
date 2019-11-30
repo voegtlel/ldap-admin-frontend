@@ -17,7 +17,7 @@
         <form [formGroup]="form" (ngSubmit)="onSubmit()" *ngIf="data">
             <ng-container *ngIf="enabled">
                 <ng-container *ngFor="let field of data.view.fields">
-                    <ng-container *ngIf="field.key !== '_enabled'" [ngSwitch]="field.type">
+                    <ng-container *ngIf="field.key !== '_enabled' && !field.hidden" [ngSwitch]="field.type">
                         <ladm-form-element
                             *ngSwitchCase="'text'"
                             [formControlRef]="form.get(field.key)"

@@ -144,6 +144,9 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
             this.form = new FormGroup(
                 this.data.view.fields.reduce((obj2, field) => {
                     let fieldValue: string | boolean = this.defaultValues[field.type];
+                    if (field.hidden) {
+                        return obj2;
+                    }
                     const validators: ValidatorFn[] = [];
                     if (field.readable && this.data.value) {
                         fieldValue = this.data.value[field.key];
@@ -176,7 +179,7 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
                     return obj2;
                 }, {}),
                 this.data.view.fields.reduce((validators, field) => {
-                    if (field.type === 'password' && !field.readable) {
+                    if (field.type === 'password' && !field.readable && !field.hidden) {
                         validators.push(matchPasswordValidator(field.key));
                     }
                     return validators;
@@ -216,6 +219,9 @@ export class ViewGroupFieldsEditComponent implements OnChanges {
         const entryFields: ViewGroupValueFields = {};
 
         this.data.view.fields.forEach(field => {
+            if (field.hidden) {
+                return;
+            }
             const formField = <FormControlWithOriginal>this.form.get(field.key);
             formField.setErrors(null);
             if (formField.dirty) {
